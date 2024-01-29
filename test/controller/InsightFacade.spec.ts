@@ -57,6 +57,14 @@ describe("InsightFacade", function () {
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
 
+		it("should reject with a bad value passed as kind", function () {
+			// Execute the addDataset method with an empty dataset id and invalid arguments
+			const invalidKind = "wrong";
+			const result = facade.addDataset("ABC", sections, invalidKind as InsightDatasetKind);
+			// Validation: Assert that the result is rejected with InsightError
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
+
 		it("should reject a null dataset", function () {
 			// Execute the addDataset method with an empty dataset id and invalid arguments
 			const result = facade.addDataset("ubc", "", InsightDatasetKind.Sections);

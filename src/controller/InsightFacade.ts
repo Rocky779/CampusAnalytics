@@ -47,6 +47,7 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError("courses/ folder not found in the zip file.");
 		}
 
+		// TODO create test data and validate performance
 		// Step 3 & 4: Parse JSON files and validate course sections
 		let validSectionsFound = false;
 		const filePromises = Object.keys(coursesFolder.files).map(async (fileName) => {
@@ -68,9 +69,10 @@ export default class InsightFacade implements IInsightFacade {
 		// return Promise.resolve(this.datasetIds);
 
 		// Verify 'kind' is a valid member of InsightDatasetKind.
-		// if (!Object.values(InsightDatasetKind).includes(kind)) {
-		// 	return Promise.reject(new Error("Invalid kind"));
-		// }
+		const validKinds = [InsightDatasetKind.Rooms, InsightDatasetKind.Sections];
+		if (!validKinds.includes(kind)) {
+			return Promise.reject(new InsightError("Invalid kind"));
+		}
 
 		// Check for Existing Dataset:
 		// Implement logic to check if a dataset with the same 'id' already exists.
