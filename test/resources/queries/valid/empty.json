@@ -1,0 +1,40 @@
+{
+  "title": "Test Query asterisk empty",
+  "input": {
+    "WHERE": {
+      "OR": [
+        {
+          "AND": [
+            {
+              "GT": {
+                "sections_avg": 100
+              }
+            },
+            {
+              "IS": {
+                "sections_dept": "*b*"
+              }
+            }
+          ]
+        },
+        {
+          "EQ": {
+            "sections_avg": 105
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "sections_dept",
+        "sections_id",
+        "sections_avg"
+      ],
+      "ORDER": "sections_avg"
+    }
+  },
+  "errorExpected": false,
+  "expected":[]
+}
+
+

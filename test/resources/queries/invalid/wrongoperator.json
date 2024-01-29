@@ -1,0 +1,35 @@
+{
+
+  "title": "wrong operator",
+
+  "input": {
+    "WHERE": {
+      "OR": [
+        {
+          "AND": [
+
+          ]
+        },
+        {
+          "200": {
+            "sections_avg": 95
+          }
+        }
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "sections_dept",
+        "sections_id",
+        "sections_avg"
+      ],
+      "ORDER": "sections_avg"
+    }
+  },
+
+  "errorExpected": true,
+
+  "expected": "InsightError"
+
+}
+

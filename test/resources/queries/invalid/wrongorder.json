@@ -1,0 +1,38 @@
+{
+
+  "title": "incorrect order",
+
+  "input": {
+
+    "WHERE": {
+
+      "GT": {
+
+        "sections_avg": 90
+
+      }
+
+    },
+
+    "OPTIONS": {
+
+      "COLUMNS": [
+
+        "sections_dept",
+
+        "sections_avg"
+
+      ],
+
+      "ORDER": 908765
+
+    }
+
+  },
+
+  "errorExpected": true,
+
+  "expected": "InsightError"
+
+}
+

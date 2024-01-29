@@ -1,0 +1,11 @@
+  {
+
+    "title": "SELECT something else",
+
+    "input": {},
+
+    "errorExpected": true,
+
+    "expected": "InsightError"
+  }
+
