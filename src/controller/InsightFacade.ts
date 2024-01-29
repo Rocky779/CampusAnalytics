@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightResult, InsightError} from "./IInsightFacade";
 
 /**
@@ -6,6 +7,8 @@ import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightResult, Insig
  *
  */
 export default class InsightFacade implements IInsightFacade {
+	// Property to track dataset IDs
+	private datasetIds: string[] = [];
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
@@ -21,24 +24,53 @@ export default class InsightFacade implements IInsightFacade {
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		// Input Validation:
 		// Ensure 'id' is a non-empty string, does not contain only whitespace or underscores.
-		if (id.includes("'_") || id.includes("") || id.includes(" ")) {
+		if (id.includes("_") || !id.trim().length || id.includes(" ")) {
 			return Promise.reject(new InsightError("Not a valid dataset"));
 		}
 
-		if (!id.trim() || id.includes("_")) {
-			return Promise.reject(new Error("Invalid ID"));
+		// Validate 'content' to ensure it's a non-empty base64 string.
+		if (
+			!content ||
+			typeof content !== "string" ||
+			!/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(content)
+		) {
+			throw new InsightError("Invalid content: Content must be a non-empty base64 string.");
 		}
 
-		// Validate 'content' to ensure it's a non-empty base64 string.
-		// Hint: Consider using a regular expression to check if 'content' is base64.
-		if (content.includes("")) {
-			return Promise.reject(new Error("Invalid content"));
+		// Step 1: Decode and unzip the base64 content
+		const zip = new JSZip();
+		const decodedContent = await zip.loadAsync(content, {base64: true});
+
+		// Step 2: Verify the structure (check for 'courses/' folder)
+		const coursesFolder = decodedContent.folder("courses");
+		if (!coursesFolder) {
+			throw new InsightError("courses/ folder not found in the zip file.");
 		}
+
+		// Step 3 & 4: Parse JSON files and validate course sections
+		let validSectionsFound = false;
+		const filePromises = Object.keys(coursesFolder.files).map(async (fileName) => {
+			const fileContent = await coursesFolder.files[fileName].async("string");
+			const jsonData = JSON.parse(fileContent);
+
+			// Check for 'result' key with at least one valid section
+			if (jsonData.result && Array.isArray(jsonData.result) && jsonData.result.length > 0) {
+				validSectionsFound = true; // Mark as found and keep checking other files
+			}
+		});
+
+		await Promise.all(filePromises);
+		if (!validSectionsFound) {
+			throw new InsightError("No valid sections found in any course file.");
+		}
+
+		// this.datasetIds.push(id); // Simplified example; ensure no duplicates, etc.
+		// return Promise.resolve(this.datasetIds);
 
 		// Verify 'kind' is a valid member of InsightDatasetKind.
-		if (!Object.values(InsightDatasetKind).includes(kind)) {
-			return Promise.reject(new Error("Invalid kind"));
-		}
+		// if (!Object.values(InsightDatasetKind).includes(kind)) {
+		// 	return Promise.reject(new Error("Invalid kind"));
+		// }
 
 		// Check for Existing Dataset:
 		// Implement logic to check if a dataset with the same 'id' already exists.
