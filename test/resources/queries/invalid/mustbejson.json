@@ -1,0 +1,10 @@
+{
+
+  "title": "Must be json not array",
+
+  "input": ["Select something from something"],
+
+  "errorExpected": true,
+
+  "expected": "InsightError"
+}
