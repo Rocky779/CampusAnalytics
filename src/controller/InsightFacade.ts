@@ -8,7 +8,7 @@ import {
 	NotFoundError,
 } from "./IInsightFacade";
 import {Section} from "../../test/resources/Section";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -118,7 +118,7 @@ export default class InsightFacade implements IInsightFacade {
 		const filePath = `data/${id}.json`;
 
 		try {
-			fs.writeFileSync(filePath, jsonString);
+			await fs.promises.writeFile(filePath, jsonString);
 		} catch (error) {
 			console.error("Error creating file:", error);
 			throw new InsightError("Error creating file");
@@ -198,8 +198,17 @@ export default class InsightFacade implements IInsightFacade {
 		if (!this.datasetIds.includes(id)) {
 			return Promise.reject(new NotFoundError("This ID does not exist in the datasetIDs"));
 		}
-		// TODO actually remove the data
-		return Promise.resolve(id);
+		// Actually remove the data
+		try {
+			await fs.promises.unlink(`data/${id}.json`);
+			// Successfully removed the file, now remove the id from datasetIds if necessary
+			this.datasetIds = this.datasetIds.filter((datasetId) => datasetId !== id);
+			return id; // Resolve with the id of the removed dataset
+		} catch (error) {
+			// Log the error and reject the promise with a more specific error
+			console.error(error);
+			throw new InsightError("Failed to remove dataset");
+		}
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
