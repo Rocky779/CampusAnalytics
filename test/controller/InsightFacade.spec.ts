@@ -83,6 +83,24 @@ describe("InsightFacade", function () {
 			return expect(result).to.eventually.have.members(["ubc"]);
 		});
 
+		it("should reject a dataset without valid sections", async function () {
+			let a3 = await getContentFromArchives("courses.zip");
+			// Execute the addDataset method with an empty dataset id and invalid arguments
+			const result = facade.addDataset("abc", a3, InsightDatasetKind.Sections);
+			// Validation: Assert that the result is rejected with InsightError
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
+		it("should reject with an invalid dataset empty zip nothing inside", async function () {
+			let a1 = await getContentFromArchives("file.zip");
+			const result = facade.addDataset("file", a1, InsightDatasetKind.Sections);
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
+		it("should reject with an invalid folder name", async function () {
+			let a2 = await getContentFromArchives("ezyzip.zip");
+			const result = facade.addDataset("file", a2, InsightDatasetKind.Sections);
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
+
 		// Execution: Test case - it should reject with an invalid dataset id (contains underscore)
 		it("should reject with an invalid dataset id (contains underscore)", function () {
 			const result = facade.addDataset("invalid_id_with_underscore", sections, InsightDatasetKind.Sections);
