@@ -204,7 +204,7 @@ describe("InsightFacade", function () {
 
 		// Setup: Execute before all tests in this suite
 		before(async function () {
-			sections = await getContentFromArchives("pair.zip");
+			sections = await getContentFromArchives("dataset.zip");
 		});
 
 		// Setup: Execute before each test in this suite
@@ -222,7 +222,7 @@ describe("InsightFacade", function () {
 			await facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
 			const result = await facade.listDatasets();
 			expect(result).to.have.lengthOf(1);
-			expect(result[0]).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 64612});
+			expect(result[0]).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
 		});
 
 		// Execution: Test case - it should fulfill with multiple datasets after adding multiple datasets
@@ -234,10 +234,10 @@ describe("InsightFacade", function () {
 			expect(result).to.have.lengthOf(2);
 
 			// Assert details for the first dataset
-			expect(result[0]).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 64612});
+			expect(result[1]).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
 
 			// Assert details for the second dataset
-			expect(result[1]).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 64612});
+			expect(result[0]).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 307});
 		});
 
 		afterEach(async function () {

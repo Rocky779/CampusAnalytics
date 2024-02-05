@@ -24,7 +24,7 @@ async function getContentFromArchives(name: string): Promise<string> {
  * Removes all files within the persistDir.
  */
 async function clearDisk(): Promise<void> {
-	await fs.remove(persistDir);
+	// await fs.remove(persistDir);
 }
 
 /**
