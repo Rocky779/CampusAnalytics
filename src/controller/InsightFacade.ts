@@ -7,7 +7,7 @@ import {
 	InsightResult,
 	NotFoundError,
 } from "./IInsightFacade";
-import {Section} from "../../test/resources/Section";
+import {Section} from "./Section";
 import * as fs from "fs-extra";
 import path from "node:path";
 /**
@@ -243,4 +243,3 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 }
-
