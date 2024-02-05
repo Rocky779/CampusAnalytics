@@ -74,12 +74,24 @@ export default class InsightFacade implements IInsightFacade {
 		await Promise.all(filePromises);
 
 		if (!validDataset) {
-			return Promise.reject(new InsightError("Invalid dataset:we dont have valid sections"));
+			return Promise.reject(new InsightError("Invalid dataset:we don't have valid sections"));
 		}
 		this.datasetIds.push(id);
 
 		// Continue with processing the dataset since it has at least one valid section
 		return Promise.resolve(this.datasetIds);
+	}
+
+	public async removeDataset(id: string): Promise<string> {
+		return Promise.reject("Not implemented.");
+	}
+
+	public async performQuery(query: unknown): Promise<InsightResult[]> {
+		return Promise.reject("Not implemented.");
+	}
+
+	public async listDatasets(): Promise<InsightDataset[]> {
+		return Promise.reject("Not implemented.");
 	}
 
 	private checkValidSectionParameterKind(section: any) {
@@ -107,17 +119,5 @@ export default class InsightFacade implements IInsightFacade {
 
 	private isValidID(id: string) {
 		return id.includes("_") || !id.trim().length || id.includes(" ");
-	}
-
-	public async removeDataset(id: string): Promise<string> {
-		return Promise.reject("Not implemented.");
-	}
-
-	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		return Promise.reject("Not implemented.");
-	}
-
-	public async listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
 	}
 }
