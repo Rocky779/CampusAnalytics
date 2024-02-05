@@ -7,7 +7,8 @@ import {
 	InsightResult,
 	NotFoundError,
 } from "./IInsightFacade";
-
+import {Section} from "../../test/resources/Section";
+import * as fs from "fs";
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -28,22 +29,13 @@ export default class InsightFacade implements IInsightFacade {
 	 * @param kind The type of the dataset (e.g., courses, rooms).
 	 * @returns A promise that resolves to an array of the current dataset IDs upon success.
 	 */
-
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		if (
-			this.isInvalidID(id) ||
-			this.isValidContent(content) ||
-			this.isValidKind(kind) ||
-			this.datasetIds.includes(id)
-		) {
+		if (this.isEntryValid(id, content, kind)) {
 			return Promise.reject(new InsightError("ERROR"));
 		}
-
 		// Step 1: Decode and unzip the base64 content
 		const zip = new JSZip();
 		const decodedContent = await zip.loadAsync(content, {base64: true});
-
-		// Step 2: Verify the structure (check for 'courses/' folder)
 		const coursesFolder = decodedContent.folder("courses");
 		if (coursesFolder === null) {
 			throw new InsightError("courses/ folder not found in the zip file.");
@@ -54,7 +46,6 @@ export default class InsightFacade implements IInsightFacade {
 		if (Object.keys(coursesFolder.files).length === 0) {
 			return Promise.reject(new InsightError("courses/ folder is empty."));
 		}
-		// Step 3: Validate course files
 		let validDataset = false;
 		const filePromises = Object.keys(coursesFolder.files).map(async (fileName) => {
 			const fileEntry = coursesFolder.files[fileName];
@@ -81,13 +72,121 @@ export default class InsightFacade implements IInsightFacade {
 		await Promise.all(filePromises);
 
 		if (!validDataset) {
-			return Promise.reject(new InsightError("Invalid dataset:we don't have valid sections"));
+			return Promise.reject(new InsightError("Invalid dataset:we dont have valid sections"));
+		} else {
+			let sectionArray: any[] = await this.addFiler(id, content);
+			await this.writeDatasetToFile(id, sectionArray);
 		}
 		this.datasetIds.push(id);
-
-		// Continue with processing the dataset since it has at least one valid section
-		// TODO Actually add the data
 		return Promise.resolve(this.datasetIds);
+	}
+
+	private isEntryValid(id: string, content: string, kind: InsightDatasetKind) {
+		return (
+			this.isInvalidID(id) ||
+			this.isValidContent(content) ||
+			this.isValidKind(kind) ||
+			this.datasetIds.includes(id)
+		);
+	}
+
+	private checkValidSectionParameterKind(section: any) {
+		return (
+			typeof section.id === "number" &&
+			typeof section.Course === "string" &&
+			typeof section.Title === "string" &&
+			typeof section.Professor === "string" &&
+			typeof section.Subject === "string" &&
+			typeof section.Year === "string" &&
+			typeof section.Avg === "number" &&
+			typeof section.Pass === "number" &&
+			typeof section.Fail === "number" &&
+			typeof section.Audit === "number"
+		);
+	}
+
+	private async writeDatasetToFile(id: string, sectionArray: any[]): Promise<void> {
+		const datasetObject: InsightDataset = {
+			id: id,
+			kind: InsightDatasetKind.Sections,
+			numRows: sectionArray.length,
+		};
+
+		sectionArray.unshift(datasetObject);
+
+		const jsonString = JSON.stringify(sectionArray, null, 2);
+		const filePath = `data/${id}.json`;
+
+		try {
+			fs.writeFileSync(filePath, jsonString);
+		} catch (error) {
+			console.error("Error creating file:", error);
+			throw new InsightError("Error creating file");
+		}
+	}
+
+	private isValidKind(kind: InsightDatasetKind) {
+		return kind !== InsightDatasetKind.Sections;
+	}
+
+	private isValidContent(content: string) {
+		return !content || !/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(content);
+	}
+
+	private isInvalidID(id: string) {
+		return id.includes("_") || !id.trim().length || id.includes(" ");
+	}
+
+	private async addFiler(id: string, content: string): Promise<Section[]> {
+		// Decode and unzip the base64 content
+		const zip = new JSZip();
+		const decodedContent = await zip.loadAsync(content, {base64: true});
+		const coursesFolder = decodedContent.folder("courses");
+		if (coursesFolder === null) {
+			throw new InsightError("courses/ folder not found in the zip file.");
+		}
+		const sectionArray: Section[] = [];
+		const filePromises = Object.keys(coursesFolder.files).map(async (fileName) => {
+			const fileEntry = coursesFolder.files[fileName];
+			let fileContent = await fileEntry.async("string");
+			try {
+				let jsonData1 = JSON.parse(fileContent);
+				if (jsonData1.result && Array.isArray(jsonData1.result) && jsonData1.result.length > 0) {
+					for (const sectionData of jsonData1.result) {
+						const newSection = this.createSectionFromData(sectionData);
+						sectionArray.push(newSection);
+					}
+				}
+			} catch (error) {
+				if (!fileEntry.dir) {
+					return Promise.reject(new InsightError("Invalid dataset: not a valid JSON file."));
+				}
+			}
+		});
+
+		await Promise.all(filePromises);
+
+		if (sectionArray.length === 0) {
+			throw new InsightError("Invalid dataset: no valid sections found.");
+		}
+
+		return sectionArray;
+	}
+
+	private createSectionFromData(sectionData: any): Section {
+		// Add logic here to handle default values or validation as needed
+		return new Section(
+			String(sectionData.id) || "",
+			sectionData.Course || "",
+			sectionData.Title || "",
+			sectionData.Professor || "",
+			sectionData.Subject || "",
+			Number(sectionData.Year) || 0,
+			sectionData.Avg || 0,
+			sectionData.Pass || 0,
+			sectionData.Fail || 0,
+			sectionData.Audit || 0
+		);
 	}
 
 	public async removeDataset(id: string): Promise<string> {
@@ -109,32 +208,5 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
-	}
-
-	private checkValidSectionParameterKind(section: any) {
-		return (
-			typeof section.id === "number" &&
-			typeof section.Course === "string" &&
-			typeof section.Title === "string" &&
-			typeof section.Professor === "string" &&
-			typeof section.Subject === "string" &&
-			typeof section.Year === "string" &&
-			typeof section.Avg === "number" &&
-			typeof section.Pass === "number" &&
-			typeof section.Fail === "number" &&
-			typeof section.Audit === "number"
-		);
-	}
-
-	private isValidKind(kind: InsightDatasetKind) {
-		return kind !== InsightDatasetKind.Sections;
-	}
-
-	private isValidContent(content: string) {
-		return !content || !/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(content);
-	}
-
-	private isInvalidID(id: string) {
-		return id.includes("_") || !id.trim().length || id.includes(" ");
 	}
 }
