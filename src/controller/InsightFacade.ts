@@ -9,6 +9,7 @@ import {
 } from "./IInsightFacade";
 import {Section} from "../../test/resources/Section";
 import * as fs from "fs-extra";
+import path from "node:path";
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -17,6 +18,7 @@ import * as fs from "fs-extra";
 export default class InsightFacade implements IInsightFacade {
 	// Property to track dataset IDs
 	private datasetIds: string[] = [];
+
 	constructor() {
 		console.log("InsightFacadeImpl::init()");
 	}
@@ -203,7 +205,7 @@ export default class InsightFacade implements IInsightFacade {
 			await fs.promises.unlink(`data/${id}.json`);
 			// Successfully removed the file, now remove the id from datasetIds if necessary
 			this.datasetIds = this.datasetIds.filter((datasetId) => datasetId !== id);
-			return id; // Resolve with the id of the removed dataset
+			return Promise.resolve(id); // Resolve with the id of the removed dataset
 		} catch (error) {
 			// Log the error and reject the promise with a more specific error
 			console.error(error);
@@ -216,6 +218,29 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+		try {
+			const dataFolderPath = "data";
+			const files = await fs.readdir(dataFolderPath);
+			const datasetObjects: any = [];
+
+			const readFilesPromises = files.map(async (file) => {
+				if (file.endsWith(".json")) {
+					const filePath = path.join(dataFolderPath, file);
+					const fileContent = await fs.readFile(filePath, "utf-8");
+					const jsonArray = JSON.parse(fileContent);
+
+					if (Array.isArray(jsonArray) && jsonArray.length > 0) {
+						datasetObjects.push(jsonArray[0]);
+					}
+				}
+			});
+
+			await Promise.all(readFilesPromises);
+			return datasetObjects;
+		} catch (error) {
+			console.error("Error listing datasets:", error);
+			throw new Error("Error listing datasets");
+		}
 	}
 }
+
