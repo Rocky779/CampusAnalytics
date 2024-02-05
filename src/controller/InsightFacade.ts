@@ -1,5 +1,12 @@
 import JSZip from "jszip";
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult} from "./IInsightFacade";
+import {
+	IInsightFacade,
+	InsightDataset,
+	InsightDatasetKind,
+	InsightError,
+	InsightResult,
+	NotFoundError,
+} from "./IInsightFacade";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -24,7 +31,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		if (
-			this.isValidID(id) ||
+			this.isInvalidID(id) ||
 			this.isValidContent(content) ||
 			this.isValidKind(kind) ||
 			this.datasetIds.includes(id)
@@ -79,11 +86,21 @@ export default class InsightFacade implements IInsightFacade {
 		this.datasetIds.push(id);
 
 		// Continue with processing the dataset since it has at least one valid section
+		// TODO Actually add the data
 		return Promise.resolve(this.datasetIds);
 	}
 
 	public async removeDataset(id: string): Promise<string> {
-		return Promise.reject("Not implemented.");
+		// check if ID is valid
+		if (this.isInvalidID(id)) {
+			return Promise.reject(new InsightError("Invalid ID"));
+		}
+		// check if ID already exists
+		if (!this.datasetIds.includes(id)) {
+			return Promise.reject(new NotFoundError("This ID does not exist in the datasetIDs"));
+		}
+		// TODO actually remove the data
+		return Promise.resolve(id);
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
@@ -117,7 +134,7 @@ export default class InsightFacade implements IInsightFacade {
 		return !content || !/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(content);
 	}
 
-	private isValidID(id: string) {
+	private isInvalidID(id: string) {
 		return id.includes("_") || !id.trim().length || id.includes(" ");
 	}
 }
