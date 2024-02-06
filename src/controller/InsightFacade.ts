@@ -45,11 +45,11 @@ export default class InsightFacade implements IInsightFacade {
 		if (Object.keys(coursesFolder.files)[0] !== "courses/") {
 			return Promise.reject(new InsightError("courses/ named folder doest exist"));
 		}
-		if (Object.keys(coursesFolder.files).length === 0) {
-			return Promise.reject(new InsightError("courses/ folder is empty."));
-		}
 		let validDataset = false;
 		const filePromises = Object.keys(coursesFolder.files).map(async (fileName) => {
+			if (!fileName.startsWith("courses/")) {
+				return Promise.reject(new InsightError("Invalid file name:"));
+			}
 			const fileEntry = coursesFolder.files[fileName];
 			let fileContent = await coursesFolder.files[fileName].async("string");
 			try {
@@ -120,10 +120,16 @@ export default class InsightFacade implements IInsightFacade {
 		const filePath = `data/${id}.json`;
 
 		try {
+			// Check if the 'data' folder exists, create it if not
+			const dataFolderExists = await fs.promises.stat("data").catch(() => false);
+			if (!dataFolderExists) {
+				await fs.promises.mkdir("data");
+			}
+
 			await fs.promises.writeFile(filePath, jsonString);
 		} catch (error) {
 			console.error("Error creating file:", error);
-			throw new InsightError("Error creating file");
+			return Promise.reject(new InsightError("Error creating file"));
 		}
 	}
 
@@ -169,7 +175,7 @@ export default class InsightFacade implements IInsightFacade {
 		await Promise.all(filePromises);
 
 		if (sectionArray.length === 0) {
-			throw new InsightError("Invalid dataset: no valid sections found.");
+			return Promise.reject( new InsightError("Invalid dataset: no valid sections found."));
 		}
 
 		return sectionArray;
@@ -208,8 +214,7 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.resolve(id); // Resolve with the id of the removed dataset
 		} catch (error) {
 			// Log the error and reject the promise with a more specific error
-			console.error(error);
-			throw new InsightError("Failed to remove dataset");
+			return Promise.reject(new InsightError("Some error"));
 		}
 	}
 
@@ -220,13 +225,24 @@ export default class InsightFacade implements IInsightFacade {
 	public async listDatasets(): Promise<InsightDataset[]> {
 		try {
 			const dataFolderPath = "data";
-			const files = await fs.readdir(dataFolderPath);
-			const datasetObjects: any = [];
+
+			// Check if the 'data' folder exists
+			const dataFolderExists = await fs.promises.stat(dataFolderPath).catch(() => false);
+			if (!dataFolderExists) {
+				return []; // Return an empty array if the 'data' folder doesn't exist
+			}
+
+			const files = await fs.promises.readdir(dataFolderPath);
+			if (files.length === 0) {
+				return []; // Return an empty array if the 'data' folder is empty
+			}
+
+			const datasetObjects: InsightDataset[] = [];
 
 			const readFilesPromises = files.map(async (file) => {
 				if (file.endsWith(".json")) {
 					const filePath = path.join(dataFolderPath, file);
-					const fileContent = await fs.readFile(filePath, "utf-8");
+					const fileContent = await fs.promises.readFile(filePath, "utf-8");
 					const jsonArray = JSON.parse(fileContent);
 
 					if (Array.isArray(jsonArray) && jsonArray.length > 0) {
@@ -238,7 +254,6 @@ export default class InsightFacade implements IInsightFacade {
 			await Promise.all(readFilesPromises);
 			return datasetObjects;
 		} catch (error) {
-			console.error("Error listing datasets:", error);
 			throw new Error("Error listing datasets");
 		}
 	}

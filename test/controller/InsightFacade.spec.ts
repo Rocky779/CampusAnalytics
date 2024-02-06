@@ -90,13 +90,20 @@ describe("InsightFacade", function () {
 			// Validation: Assert that the result is rejected with InsightError
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
+		it("should reject a dataset without valid structure", async function () {
+			let a4 = await getContentFromArchives("wrong.zip");
+			// Execute the addDataset method with an empty dataset id and invalid arguments
+			const result = facade.addDataset("abc", a4, InsightDatasetKind.Sections);
+			// Validation: Assert that the result is rejected with InsightError
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
 		it("should reject with an invalid dataset empty zip nothing inside", async function () {
 			let a1 = await getContentFromArchives("file.zip");
 			const result = facade.addDataset("file", a1, InsightDatasetKind.Sections);
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
 		it("should reject with an invalid folder name", async function () {
-			let a2 = await getContentFromArchives("ezyzip.zip");
+			let a2 = await getContentFromArchives("ezyzip1.zip");
 			const result = facade.addDataset("file", a2, InsightDatasetKind.Sections);
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
@@ -234,10 +241,10 @@ describe("InsightFacade", function () {
 			expect(result).to.have.lengthOf(2);
 
 			// Assert details for the first dataset
-			expect(result[1]).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
 
 			// Assert details for the second dataset
-			expect(result[0]).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 307});
 		});
 
 		afterEach(async function () {
