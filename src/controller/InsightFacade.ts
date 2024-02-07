@@ -40,7 +40,7 @@ export default class InsightFacade implements IInsightFacade {
 		const decodedContent = await zip.loadAsync(content, {base64: true});
 		const coursesFolder = decodedContent.folder("courses");
 		if (coursesFolder === null) {
-			throw new InsightError("courses/ folder not found in the zip file.");
+			return Promise.reject( new InsightError("courses/ folder not found in the zip file."));
 		}
 		if (Object.keys(coursesFolder.files)[0] !== "courses/") {
 			return Promise.reject(new InsightError("courses/ named folder doest exist"));
@@ -218,7 +218,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		return Promise.reject("Not implemented.");
+		return Promise.reject(new InsightError("Not implemented."));
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
