@@ -97,6 +97,13 @@ describe("InsightFacade", function () {
 			// Validation: Assert that the result is rejected with InsightError
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
+		it("should reject a dataset without valid structure", async function () {
+			let a5 = await getContentFromArchives("wanga.zip");
+			// Execute the addDataset method with an empty dataset id and invalid arguments
+			const result = facade.addDataset("abc", a5, InsightDatasetKind.Sections);
+			// Validation: Assert that the result is rejected with InsightError
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
 		it("should reject with an invalid dataset empty zip nothing inside", async function () {
 			let a1 = await getContentFromArchives("file.zip");
 			const result = facade.addDataset("file", a1, InsightDatasetKind.Sections);
@@ -236,15 +243,17 @@ describe("InsightFacade", function () {
 		it("should fulfill with multiple datasets after adding multiple datasets", async function () {
 			await facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
 			await facade.addDataset("sfu", sections, InsightDatasetKind.Sections);
+			await facade.addDataset("afu", sections, InsightDatasetKind.Sections);
+			await facade.addDataset("bbc", sections, InsightDatasetKind.Sections);
 
 			const result = await facade.listDatasets();
-			expect(result).to.have.lengthOf(2);
-
+			expect(result).to.have.lengthOf(4);
 			// Assert details for the first dataset
-			expect(result).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
-
+			expect(result[1]).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 307});
 			// Assert details for the second dataset
-			expect(result).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result[0]).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result[2]).to.deep.include({id: "afu", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result[3]).to.deep.include({id: "bbc", kind: InsightDatasetKind.Sections, numRows: 307});
 		});
 
 		afterEach(async function () {

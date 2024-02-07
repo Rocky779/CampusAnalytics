@@ -32,7 +32,7 @@ export default class InsightFacade implements IInsightFacade {
 	 * @returns A promise that resolves to an array of the current dataset IDs upon success.
 	 */
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		if (this.isEntryValid(id, content, kind)) {
+		if (this.isEntryInValid(id, content, kind)) {
 			return Promise.reject(new InsightError("ERROR"));
 		}
 		// Step 1: Decode and unzip the base64 content
@@ -40,7 +40,7 @@ export default class InsightFacade implements IInsightFacade {
 		const decodedContent = await zip.loadAsync(content, {base64: true});
 		const coursesFolder = decodedContent.folder("courses");
 		if (coursesFolder === null) {
-			throw new InsightError("courses/ folder not found in the zip file.");
+			return Promise.reject( new InsightError("courses/ folder not found in the zip file."));
 		}
 		if (Object.keys(coursesFolder.files)[0] !== "courses/") {
 			return Promise.reject(new InsightError("courses/ named folder doest exist"));
@@ -83,11 +83,11 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.resolve(this.datasetIds);
 	}
 
-	private isEntryValid(id: string, content: string, kind: InsightDatasetKind) {
+	private isEntryInValid(id: string, content: string, kind: InsightDatasetKind) {
 		return (
 			this.isInvalidID(id) ||
-			this.isValidContent(content) ||
-			this.isValidKind(kind) ||
+			this.isInValidContent(content) ||
+			this.isInValidKind(kind) ||
 			this.datasetIds.includes(id)
 		);
 	}
@@ -125,24 +125,31 @@ export default class InsightFacade implements IInsightFacade {
 			if (!dataFolderExists) {
 				await fs.promises.mkdir("data");
 			}
-
 			await fs.promises.writeFile(filePath, jsonString);
 		} catch (error) {
-			console.error("Error creating file:", error);
 			return Promise.reject(new InsightError("Error creating file"));
 		}
 	}
 
-	private isValidKind(kind: InsightDatasetKind) {
-		return kind !== InsightDatasetKind.Sections;
+	private isInValidKind(kind: InsightDatasetKind) {
+		if( kind !== InsightDatasetKind.Sections){
+			return true;
+		}
 	}
 
-	private isValidContent(content: string) {
-		return !content || !/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(content);
+	private isInValidContent(content: string) {
+		if ((content === null) || content === "") {
+			return true;
+		}
 	}
 
 	private isInvalidID(id: string) {
-		return id.includes("_") || !id.trim().length || id.includes(" ");
+		if (!id ) {
+			return true;
+		}
+		if (id.includes("_") || id.trim().length === 0) {
+			return true;
+		}
 	}
 
 	private async addFiler(id: string, content: string): Promise<Section[]> {
@@ -184,16 +191,16 @@ export default class InsightFacade implements IInsightFacade {
 	private createSectionFromData(sectionData: any): Section {
 		// Add logic here to handle default values or validation as needed
 		return new Section(
-			String(sectionData.id) || "",
-			sectionData.Course || "",
-			sectionData.Title || "",
-			sectionData.Professor || "",
-			sectionData.Subject || "",
-			Number(sectionData.Year) || 0,
-			sectionData.Avg || 0,
-			sectionData.Pass || 0,
-			sectionData.Fail || 0,
-			sectionData.Audit || 0
+			String(sectionData.id),
+			sectionData.Course ,
+			sectionData.Title ,
+			sectionData.Professor ,
+			sectionData.Subject ,
+			Number(sectionData.Year) ,
+			sectionData.Avg ,
+			sectionData.Pass ,
+			sectionData.Fail ,
+			sectionData.Audit
 		);
 	}
 
@@ -213,48 +220,44 @@ export default class InsightFacade implements IInsightFacade {
 			this.datasetIds = this.datasetIds.filter((datasetId) => datasetId !== id);
 			return Promise.resolve(id); // Resolve with the id of the removed dataset
 		} catch (error) {
-			// Log the error and reject the promise with a more specific error
 			return Promise.reject(new InsightError("Some error"));
 		}
 	}
 
-	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		return Promise.reject("Not implemented.");
-	}
-
 	public async listDatasets(): Promise<InsightDataset[]> {
 		try {
+			if (this.datasetIds.length === 0) {
+				return Promise.resolve([]); // Return empty array if no dataset IDs are available
+			}
 			const dataFolderPath = "data";
 
-			// Check if the 'data' folder exists
-			const dataFolderExists = await fs.promises.stat(dataFolderPath).catch(() => false);
-			if (!dataFolderExists) {
-				return []; // Return an empty array if the 'data' folder doesn't exist
-			}
-
-			const files = await fs.promises.readdir(dataFolderPath);
-			if (files.length === 0) {
-				return []; // Return an empty array if the 'data' folder is empty
-			}
-
-			const datasetObjects: InsightDataset[] = [];
-
-			const readFilesPromises = files.map(async (file) => {
-				if (file.endsWith(".json")) {
-					const filePath = path.join(dataFolderPath, file);
+			const readFilesPromises = this.datasetIds.map(async (id) => {
+				const filePath = path.join(dataFolderPath, `${id}.json`);
+				try {
 					const fileContent = await fs.promises.readFile(filePath, "utf-8");
 					const jsonArray = JSON.parse(fileContent);
 
 					if (Array.isArray(jsonArray) && jsonArray.length > 0) {
-						datasetObjects.push(jsonArray[0]);
+						return jsonArray[0];
+					} else {
+						return null; // If file content is empty or not an array
 					}
+				} catch (error) {
+					return null; // Skip if file doesn't exist or cannot be read
 				}
 			});
 
-			await Promise.all(readFilesPromises);
-			return datasetObjects;
+			const datasetObjects = await Promise.all(readFilesPromises);
+			// Filter out null values (failed reads or empty arrays)
+			const filteredDatasetObjects = datasetObjects.filter((obj) => obj !== null);
+
+			return Promise.resolve(filteredDatasetObjects);
 		} catch (error) {
-			throw new Error("Error listing datasets");
+			return Promise.reject(new Error("Error listing datasets"));
 		}
+	}
+
+	public async performQuery(query: unknown): Promise<InsightResult[]> {
+		return Promise.resolve([]);
 	}
 }
