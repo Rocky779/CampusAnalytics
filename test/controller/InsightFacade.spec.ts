@@ -243,15 +243,17 @@ describe("InsightFacade", function () {
 		it("should fulfill with multiple datasets after adding multiple datasets", async function () {
 			await facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
 			await facade.addDataset("sfu", sections, InsightDatasetKind.Sections);
+			await facade.addDataset("afu", sections, InsightDatasetKind.Sections);
+			await facade.addDataset("bbc", sections, InsightDatasetKind.Sections);
 
 			const result = await facade.listDatasets();
-			expect(result).to.have.lengthOf(2);
-
+			expect(result).to.have.lengthOf(4);
 			// Assert details for the first dataset
-			expect(result).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 307});
-
+			expect(result[1]).to.deep.include({id: "sfu", kind: InsightDatasetKind.Sections, numRows: 307});
 			// Assert details for the second dataset
-			expect(result).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result[0]).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result[2]).to.deep.include({id: "afu", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(result[3]).to.deep.include({id: "bbc", kind: InsightDatasetKind.Sections, numRows: 307});
 		});
 
 		afterEach(async function () {

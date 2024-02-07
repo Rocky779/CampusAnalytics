@@ -32,7 +32,7 @@ export default class InsightFacade implements IInsightFacade {
 	 * @returns A promise that resolves to an array of the current dataset IDs upon success.
 	 */
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		if (this.isEntryValid(id, content, kind)) {
+		if (this.isEntryInValid(id, content, kind)) {
 			return Promise.reject(new InsightError("ERROR"));
 		}
 		// Step 1: Decode and unzip the base64 content
@@ -83,11 +83,11 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.resolve(this.datasetIds);
 	}
 
-	private isEntryValid(id: string, content: string, kind: InsightDatasetKind) {
+	private isEntryInValid(id: string, content: string, kind: InsightDatasetKind) {
 		return (
 			this.isInvalidID(id) ||
-			this.isValidContent(content) ||
-			this.isValidKind(kind) ||
+			this.isInValidContent(content) ||
+			this.isInValidKind(kind) ||
 			this.datasetIds.includes(id)
 		);
 	}
@@ -125,24 +125,31 @@ export default class InsightFacade implements IInsightFacade {
 			if (!dataFolderExists) {
 				await fs.promises.mkdir("data");
 			}
-
 			await fs.promises.writeFile(filePath, jsonString);
 		} catch (error) {
-			console.error("Error creating file:", error);
 			return Promise.reject(new InsightError("Error creating file"));
 		}
 	}
 
-	private isValidKind(kind: InsightDatasetKind) {
-		return kind !== InsightDatasetKind.Sections;
+	private isInValidKind(kind: InsightDatasetKind) {
+		if( kind !== InsightDatasetKind.Sections){
+			return true;
+		}
 	}
 
-	private isValidContent(content: string) {
-		return !content;
+	private isInValidContent(content: string) {
+		if ((content === null) || content === "") {
+			return true;
+		}
 	}
 
 	private isInvalidID(id: string) {
-		return id.includes("_") || !id.trim().length || id.includes(" ");
+		if (!id ) {
+			return true;
+		}
+		if (id.includes("_") || id.trim().length === 0) {
+			return true;
+		}
 	}
 
 	private async addFiler(id: string, content: string): Promise<Section[]> {
@@ -217,43 +224,40 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 
-	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		return Promise.reject(new InsightError("Not implemented."));
-	}
-
 	public async listDatasets(): Promise<InsightDataset[]> {
 		try {
+			if (this.datasetIds.length === 0) {
+				return Promise.resolve([]); // Return empty array if no dataset IDs are available
+			}
 			const dataFolderPath = "data";
 
-			// Check if the 'data' folder exists
-			const dataFolderExists = await fs.promises.stat(dataFolderPath).catch(() => false);
-			if (!dataFolderExists) {
-				return Promise.resolve([]); // Return an empty array if the 'data' folder doesn't exist
-			}
-
-			const files = await fs.promises.readdir(dataFolderPath);
-			if (files.length === 0) {
-				return Promise.resolve([]); // Return an empty array if the 'data' folder is empty
-			}
-
-			const datasetObjects: InsightDataset[] = [];
-
-			const readFilesPromises = files.map(async (file) => {
-				if (file.endsWith(".json")) {
-					const filePath = path.join(dataFolderPath, file);
+			const readFilesPromises = this.datasetIds.map(async (id) => {
+				const filePath = path.join(dataFolderPath, `${id}.json`);
+				try {
 					const fileContent = await fs.promises.readFile(filePath, "utf-8");
 					const jsonArray = JSON.parse(fileContent);
 
 					if (Array.isArray(jsonArray) && jsonArray.length > 0) {
-						datasetObjects.push(jsonArray[0]);
+						return jsonArray[0];
+					} else {
+						return null; // If file content is empty or not an array
 					}
+				} catch (error) {
+					return null; // Skip if file doesn't exist or cannot be read
 				}
 			});
 
-			await Promise.all(readFilesPromises);
-			return Promise.resolve(datasetObjects);
+			const datasetObjects = await Promise.all(readFilesPromises);
+			// Filter out null values (failed reads or empty arrays)
+			const filteredDatasetObjects = datasetObjects.filter((obj) => obj !== null);
+
+			return Promise.resolve(filteredDatasetObjects);
 		} catch (error) {
-			throw new Error("Error listing datasets");
+			return Promise.reject(new Error("Error listing datasets"));
 		}
+	}
+
+	public async performQuery(query: unknown): Promise<InsightResult[]> {
+		return Promise.resolve([]);
 	}
 }
