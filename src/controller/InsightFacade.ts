@@ -138,7 +138,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	private isValidContent(content: string) {
-		return !content || !/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(content);
+		return !content;
 	}
 
 	private isInvalidID(id: string) {
@@ -184,16 +184,16 @@ export default class InsightFacade implements IInsightFacade {
 	private createSectionFromData(sectionData: any): Section {
 		// Add logic here to handle default values or validation as needed
 		return new Section(
-			String(sectionData.id) || "",
-			sectionData.Course || "",
-			sectionData.Title || "",
-			sectionData.Professor || "",
-			sectionData.Subject || "",
-			Number(sectionData.Year) || 0,
-			sectionData.Avg || 0,
-			sectionData.Pass || 0,
-			sectionData.Fail || 0,
-			sectionData.Audit || 0
+			String(sectionData.id),
+			sectionData.Course ,
+			sectionData.Title ,
+			sectionData.Professor ,
+			sectionData.Subject ,
+			Number(sectionData.Year) ,
+			sectionData.Avg ,
+			sectionData.Pass ,
+			sectionData.Fail ,
+			sectionData.Audit
 		);
 	}
 
@@ -213,7 +213,6 @@ export default class InsightFacade implements IInsightFacade {
 			this.datasetIds = this.datasetIds.filter((datasetId) => datasetId !== id);
 			return Promise.resolve(id); // Resolve with the id of the removed dataset
 		} catch (error) {
-			// Log the error and reject the promise with a more specific error
 			return Promise.reject(new InsightError("Some error"));
 		}
 	}
@@ -229,12 +228,12 @@ export default class InsightFacade implements IInsightFacade {
 			// Check if the 'data' folder exists
 			const dataFolderExists = await fs.promises.stat(dataFolderPath).catch(() => false);
 			if (!dataFolderExists) {
-				return []; // Return an empty array if the 'data' folder doesn't exist
+				return Promise.resolve([]); // Return an empty array if the 'data' folder doesn't exist
 			}
 
 			const files = await fs.promises.readdir(dataFolderPath);
 			if (files.length === 0) {
-				return []; // Return an empty array if the 'data' folder is empty
+				return Promise.resolve([]); // Return an empty array if the 'data' folder is empty
 			}
 
 			const datasetObjects: InsightDataset[] = [];
@@ -252,7 +251,7 @@ export default class InsightFacade implements IInsightFacade {
 			});
 
 			await Promise.all(readFilesPromises);
-			return datasetObjects;
+			return Promise.resolve(datasetObjects);
 		} catch (error) {
 			throw new Error("Error listing datasets");
 		}
