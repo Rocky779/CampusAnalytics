@@ -242,7 +242,9 @@ export class QueryHelper {
 			for (const item of jsonData) {
 				// Evaluate the condition for each item
 				if (this.evaluateCondition(item, condition)) {
-					matchingItems.push(item);
+					if (!Object.values(item).some((value) => value === undefined)) {
+						matchingItems.push(item);
+					}
 				}
 			}
 
@@ -274,7 +276,7 @@ export class QueryHelper {
 			// Call the dynamically created function with the item and get the result
 			const result = evaluator(item);
 			// Convert the result to a boolean value
-			return Boolean(result);
+			return result;
 		} catch (error) {
 			console.error("Error evaluating condition:", error);
 			return false; // Return false if there's an error evaluating the condition
