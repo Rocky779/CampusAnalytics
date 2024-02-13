@@ -210,6 +210,7 @@ export class QueryHelper {
 		if (!allIDs.has(id)) {
 			throw new Error(`Invalid ID prefix ${id}`);
 		}
+		// CITATION OF THIS WILDCARD REGEX :https://stackoverflow.com/questions/52143451/javascript-filter-with-wildcard
 		if (operator === "IS" && typeof value === "string" && value.includes("*")) {
 			const a = value.replace(/\*/g, ".*"); // Replace * with .* in the value
 			return `new RegExp('^${a}$').test(${suffix})`; // Construct regex test condition
@@ -260,6 +261,7 @@ export class QueryHelper {
 
 		// Replace each field name with "item.fieldName"
 		for (const fieldName of fieldNames) {
+			// CITATION: regex provided by chatGPT
 			const regex = new RegExp(`\\b${fieldName}\\b`, "g");
 			condition = condition.replace(regex, `item.${fieldName}`);
 		}
