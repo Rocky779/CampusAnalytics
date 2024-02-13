@@ -296,10 +296,11 @@ export default class InsightFacade implements IInsightFacade {
 			// Perform the query
 			const condString = this.queryHelper.traverseWhereClause(query.WHERE, allIDs);
 			const items = await this.queryHelper.getMatchingItems(Array.from(allIDs)[0], condString);
-			const wanted = this.queryHelper.traverseOptions(items, query.OPTIONS);
+			let wanted = this.queryHelper.traverseOptions(items, query.OPTIONS);
+			wanted = wanted.filter((item: any) => Object.values(item).every((val: any) => val !== undefined));
 
 			// Check if the result is too large
-			if (items.length > 5000) {
+			if (wanted.length > 5000) {
 				return Promise.reject(new ResultTooLargeError("Too big"));
 			}
 
