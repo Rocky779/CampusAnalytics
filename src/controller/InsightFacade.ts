@@ -5,7 +5,8 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError, ResultTooLargeError,
+	NotFoundError,
+	ResultTooLargeError,
 } from "./IInsightFacade";
 import {Section} from "./Section";
 import * as fs from "fs-extra";
@@ -43,7 +44,7 @@ export default class InsightFacade implements IInsightFacade {
 		const decodedContent = await zip.loadAsync(content, {base64: true});
 		const coursesFolder = decodedContent.folder("courses");
 		if (coursesFolder === null) {
-			return Promise.reject( new InsightError("courses/ folder not found in the zip file."));
+			return Promise.reject(new InsightError("courses/ folder not found in the zip file."));
 		}
 		if (Object.keys(coursesFolder.files)[0] !== "courses/") {
 			return Promise.reject(new InsightError("courses/ named folder doest exist"));
@@ -110,7 +111,6 @@ export default class InsightFacade implements IInsightFacade {
 		);
 	}
 
-
 	private async writeDatasetToFile(id: string, sectionArray: any[]): Promise<void> {
 		const datasetObject: InsightDataset = {
 			id: id,
@@ -136,19 +136,19 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	private isInValidKind(kind: InsightDatasetKind) {
-		if( kind !== InsightDatasetKind.Sections){
+		if (kind !== InsightDatasetKind.Sections) {
 			return true;
 		}
 	}
 
 	private isInValidContent(content: string) {
-		if ((content === null) || content === "") {
+		if (content === null || content === "") {
 			return true;
 		}
 	}
 
 	private isInvalidID(id: string) {
-		if (!id ) {
+		if (!id) {
 			return true;
 		}
 		if (id.includes("_") || id.trim().length === 0) {
@@ -190,7 +190,7 @@ export default class InsightFacade implements IInsightFacade {
 		await Promise.all(filePromises);
 
 		if (sectionArray.length === 0) {
-			return Promise.reject( new InsightError("Invalid dataset: no valid sections found."));
+			return Promise.reject(new InsightError("Invalid dataset: no valid sections found."));
 		}
 
 		return sectionArray;
@@ -200,14 +200,14 @@ export default class InsightFacade implements IInsightFacade {
 		// Add logic here to handle default values or validation as needed
 		return new Section(
 			String(sectionData.id),
-			sectionData.Course ,
-			sectionData.Title ,
-			sectionData.Professor ,
-			sectionData.Subject ,
-			Number(sectionData.Year) ,
-			sectionData.Avg ,
-			sectionData.Pass ,
-			sectionData.Fail ,
+			sectionData.Course,
+			sectionData.Title,
+			sectionData.Professor,
+			sectionData.Subject,
+			Number(sectionData.Year),
+			sectionData.Avg,
+			sectionData.Pass,
+			sectionData.Fail,
 			sectionData.Audit
 		);
 	}
@@ -309,5 +309,4 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.reject(new InsightError("Error parsing query JSON."));
 		}
 	}
-
 }

@@ -111,8 +111,12 @@ export class QueryHelper {
 		}
 
 		// Check if COLUMNS property exists and is an array
-		if (!options.COLUMNS || !Array.isArray(options.COLUMNS) ||
-			options.COLUMNS.length === 0 || Object.keys(options).length > 2) {
+		if (
+			!options.COLUMNS ||
+			!Array.isArray(options.COLUMNS) ||
+			options.COLUMNS.length === 0 ||
+			Object.keys(options).length > 2
+		) {
 			return false;
 		}
 
@@ -264,15 +268,13 @@ export class QueryHelper {
 		try {
 			// Preprocess the condition to replace field names with "item.fieldName"
 			condition = this.preprocessCondition(item, condition);
-
 			// Use Function constructor to create a function that evaluates the condition
 			const evaluator = new Function("item", `return ${condition}`);
 
 			// Call the dynamically created function with the item and get the result
 			const result = evaluator(item);
-
 			// Convert the result to a boolean value
-			return result;
+			return Boolean(result);
 		} catch (error) {
 			console.error("Error evaluating condition:", error);
 			return false; // Return false if there's an error evaluating the condition
@@ -291,9 +293,7 @@ export class QueryHelper {
 			const filteredItem: any = {};
 			requestedFields.forEach((field: string) => {
 				const actualField = field.split("_")[1]; // Extract the actual field name
-				if (item[actualField]) {
-					filteredItem[field] = item[actualField];
-				}
+				filteredItem[field] = item[actualField];
 			});
 			return filteredItem;
 		});
