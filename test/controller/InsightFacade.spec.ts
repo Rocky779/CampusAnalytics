@@ -282,7 +282,9 @@ describe("InsightFacade", function () {
 			validQueries.forEach(function (test: any) {
 				it(`${test.title}`, async function () {
 					try {
+
 						const result = await facade.performQuery(test.input);
+						console.log(result);
 						expect(result).to.have.deep.members(test.expected);
 						expect(result).to.have.length(test.expected.length);
 					} catch (err) {
