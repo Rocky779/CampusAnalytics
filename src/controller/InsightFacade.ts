@@ -21,10 +21,33 @@ export default class InsightFacade implements IInsightFacade {
 	// Property to track dataset IDs
 	private datasetIds: string[] = [];
 	private queryHelper: QueryHelper;
-
 	constructor() {
 		this.queryHelper = new QueryHelper();
+		// LOAD PREVIOUS SAVED DATASET HERE
+		this.loadDatasetIds().then(() => {
+			console.log("Dataset IDs loaded successfully:", this.datasetIds);
+		}).catch((error) => {
+			console.error("Error loading dataset IDs:", error);
+		});
 		console.log("InsightFacadeImpl::init()");
+	}
+
+	private async loadDatasetIds() {
+		const dataFolderPath = "data"; // Path to the data folder
+		try {
+			// Read the contents of the data folder
+			const files = await fs.readdir(dataFolderPath);
+
+			// Extract dataset IDs from file names
+			files.forEach((file) => {
+				const id = file.replace(".json", ""); // Remove the file extension
+				this.datasetIds.push(id);
+			});
+
+			console.log("Loaded dataset IDs:", this.datasetIds);
+		} catch (err) {
+			console.error("Error reading data folder:", err);
+		}
 	}
 
 	/**
