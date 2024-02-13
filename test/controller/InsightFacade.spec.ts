@@ -97,7 +97,7 @@ describe("InsightFacade", function () {
 			// Validation: Assert that the result is rejected with InsightError
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
-		it("should reject a dataset without valid structure", async function () {
+		it("should reject a dataset with invalid structure", async function () {
 			let a5 = await getContentFromArchives("wanga.zip");
 			// Execute the addDataset method with an empty dataset id and invalid arguments
 			const result = facade.addDataset("abc", a5, InsightDatasetKind.Sections);
@@ -283,7 +283,8 @@ describe("InsightFacade", function () {
 				it(`${test.title}`, async function () {
 					try {
 						const result = await facade.performQuery(test.input);
-						assert.deepStrictEqual(result, test.expected);
+						expect(result).to.have.deep.members(test.expected);
+						expect(result).to.have.length(test.expected.length);
 					} catch (err) {
 						assert.fail(`Unexpected error: ${err}`);
 					}

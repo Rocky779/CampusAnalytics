@@ -5,11 +5,12 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError,
+	NotFoundError, ResultTooLargeError,
 } from "./IInsightFacade";
 import {Section} from "./Section";
 import * as fs from "fs-extra";
 import path from "node:path";
+import {QueryHelper} from "./helper";
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -18,8 +19,10 @@ import path from "node:path";
 export default class InsightFacade implements IInsightFacade {
 	// Property to track dataset IDs
 	private datasetIds: string[] = [];
+	private queryHelper: QueryHelper;
 
 	constructor() {
+		this.queryHelper = new QueryHelper();
 		console.log("InsightFacadeImpl::init()");
 	}
 
@@ -99,13 +102,14 @@ export default class InsightFacade implements IInsightFacade {
 			typeof section.Title === "string" &&
 			typeof section.Professor === "string" &&
 			typeof section.Subject === "string" &&
-			typeof section.Year === "string" &&
+			typeof section.Year === "string" && // Updated year check
 			typeof section.Avg === "number" &&
 			typeof section.Pass === "number" &&
 			typeof section.Fail === "number" &&
 			typeof section.Audit === "number"
 		);
 	}
+
 
 	private async writeDatasetToFile(id: string, sectionArray: any[]): Promise<void> {
 		const datasetObject: InsightDataset = {
@@ -168,6 +172,10 @@ export default class InsightFacade implements IInsightFacade {
 				let jsonData1 = JSON.parse(fileContent);
 				if (jsonData1.result && Array.isArray(jsonData1.result) && jsonData1.result.length > 0) {
 					for (const sectionData of jsonData1.result) {
+						if (sectionData.Section === "overall") {
+							sectionData.Year = "1900";
+						}
+
 						const newSection = this.createSectionFromData(sectionData);
 						sectionArray.push(newSection);
 					}
@@ -257,7 +265,49 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 
-	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		return Promise.resolve([]);
+	public async performQuery(query: any): Promise<InsightResult[]> {
+		try {
+			const queryString = JSON.stringify(query);
+
+			// Check if WHERE and OPTIONS properties exist
+			if (!query.WHERE || !query.OPTIONS) {
+				return Promise.reject(new InsightError("WHERE and OPTIONS properties are required."));
+			}
+
+			// Validate WHERE clause
+			const allIDs: Set<string> = new Set<string>();
+			const isValidWhere = this.queryHelper.isValidWhereClause(query.WHERE, allIDs);
+			if (!isValidWhere) {
+				return Promise.reject(new InsightError("Invalid WHERE clause."));
+			}
+
+			// Validate OPTIONS
+			const isValidOptions = this.queryHelper.isValidOptions(query.OPTIONS, allIDs);
+			if (!isValidOptions) {
+				return Promise.reject(new InsightError("Invalid OPTIONS."));
+			}
+
+			// Check if the dataset ID exists
+			const idExists = await this.queryHelper.checkIDExists(Array.from(allIDs)[0]);
+			if (!idExists) {
+				return Promise.reject(new InsightError("IDs not found in the data directory."));
+			}
+
+			// Perform the query
+			const condString = this.queryHelper.traverseWhereClause(query.WHERE, allIDs);
+			const items = await this.queryHelper.getMatchingItems(Array.from(allIDs)[0], condString);
+			const wanted = this.queryHelper.traverseOptions(items, query.OPTIONS);
+
+			// Check if the result is too large
+			if (items.length > 5000) {
+				return Promise.reject(new ResultTooLargeError("Too big"));
+			}
+
+			// Return the result
+			return Promise.resolve(wanted);
+		} catch (error) {
+			return Promise.reject(new InsightError("Error parsing query JSON."));
+		}
 	}
+
 }
