@@ -82,12 +82,13 @@ describe("InsightFacade", function () {
 			const result = facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
 			return expect(result).to.eventually.have.members(["ubc"]);
 		});
-		it("should have persistance", function () {
-			const result0 = facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
+		it("should have persistence", async function () {
+			const result0 = await facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
 			let facade2 = new InsightFacade();
 			const result2 = facade2.addDataset("ubc", sections, InsightDatasetKind.Sections);
 			return expect(result2).to.eventually.be.rejectedWith(InsightError);
 		});
+
 
 		it("should reject a dataset without valid sections", async function () {
 			let a3 = await getContentFromArchives("courses.zip");
