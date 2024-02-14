@@ -23,12 +23,6 @@ export default class InsightFacade implements IInsightFacade {
 	private queryHelper: QueryHelper;
 	constructor() {
 		this.queryHelper = new QueryHelper();
-		// LOAD PREVIOUS SAVED DATASET HERE
-		// this.init().then(() => {
-		// 	console.log("Dataset IDs loaded successfully:", this.datasetIds);
-		// }).catch((error) => {
-		// 	console.log(error);
-		// });
 		console.log("InsightFacadeImpl::init()");
 	}
 
