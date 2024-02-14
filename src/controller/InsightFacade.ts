@@ -32,10 +32,6 @@ export default class InsightFacade implements IInsightFacade {
 		console.log("InsightFacadeImpl::init()");
 	}
 
-	// public async init() {
-	// 	await this.loadDatasetIds();
-	// }
-
 	public async loadDatasetIds() {
 		const dataFolderPath = "data"; // Path to the data folder
 		try {
