@@ -23,30 +23,25 @@ export default class InsightFacade implements IInsightFacade {
 	private queryHelper: QueryHelper;
 	constructor() {
 		this.queryHelper = new QueryHelper();
-		// LOAD PREVIOUS SAVED DATASET HERE
-		this.loadDatasetIds().then(() => {
-			console.log("Dataset IDs loaded successfully:", this.datasetIds);
-		}).catch((error) => {
-			console.error("Error loading dataset IDs:", error);
-		});
 		console.log("InsightFacadeImpl::init()");
 	}
 
-	private async loadDatasetIds() {
+	public async loadDatasetIds() {
 		const dataFolderPath = "data"; // Path to the data folder
 		try {
 			// Read the contents of the data folder
 			const files = await fs.readdir(dataFolderPath);
-
 			// Extract dataset IDs from file names
 			files.forEach((file) => {
 				const id = file.replace(".json", ""); // Remove the file extension
-				this.datasetIds.push(id);
+				if (!this.datasetIds.includes(id)) {
+					this.datasetIds.push(id);
+				}
 			});
 
-			console.log("Loaded dataset IDs:", this.datasetIds);
+			// console.log("Loaded dataset IDs:", this.datasetIds);
 		} catch (err) {
-			console.error("Error reading data folder:", err);
+			// console.error("Error reading data folder:", err);
 		}
 	}
 
@@ -59,6 +54,10 @@ export default class InsightFacade implements IInsightFacade {
 	 * @returns A promise that resolves to an array of the current dataset IDs upon success.
 	 */
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+		// if(await this.isDatasetIdFileExists(id)){
+		// 	return Promise.reject(new InsightError("ERROR"));
+		// }
+		await this.loadDatasetIds();
 		if (this.isEntryInValid(id, content, kind)) {
 			return Promise.reject(new InsightError("ERROR"));
 		}
@@ -97,9 +96,7 @@ export default class InsightFacade implements IInsightFacade {
 				}
 			}
 		});
-
 		await Promise.all(filePromises);
-
 		if (!validDataset) {
 			return Promise.reject(new InsightError("Invalid dataset:we dont have valid sections"));
 		} else {
@@ -117,6 +114,17 @@ export default class InsightFacade implements IInsightFacade {
 			this.isInValidKind(kind) ||
 			this.datasetIds.includes(id)
 		);
+	}
+
+	private async isDatasetIdFileExists(id: string): Promise<boolean> {
+		const filePath = path.join("data", `${id}.json`);
+		try {
+			await fs.promises.access(filePath, fs.constants.F_OK);
+			await this.loadDatasetIds();
+			return Promise.reject(new InsightError("ERROR"));
+		} catch (error) {
+			return false; // File does not exist or other error occurred
+		}
 	}
 
 	private checkValidSectionParameterKind(section: any) {
@@ -236,12 +244,15 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async removeDataset(id: string): Promise<string> {
+		await this.loadDatasetIds();
 		// check if ID is valid
 		if (this.isInvalidID(id)) {
 			return Promise.reject(new InsightError("Invalid ID"));
 		}
 		// check if ID already exists
 		if (!this.datasetIds.includes(id)) {
+			console.log("Debug");
+			console.log(this.datasetIds);
 			return Promise.reject(new NotFoundError("This ID does not exist in the datasetIDs"));
 		}
 		// Actually remove the data
@@ -256,6 +267,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
+		await this.loadDatasetIds();
 		try {
 			if (this.datasetIds.length === 0) {
 				return Promise.resolve([]); // Return empty array if no dataset IDs are available

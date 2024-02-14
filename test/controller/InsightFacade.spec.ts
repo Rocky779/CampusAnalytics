@@ -82,6 +82,13 @@ describe("InsightFacade", function () {
 			const result = facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
 			return expect(result).to.eventually.have.members(["ubc"]);
 		});
+		it("should have persistence", async function () {
+			const result0 = await facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
+			let facade2 = new InsightFacade();
+			const result2 = facade2.addDataset("ubc", sections, InsightDatasetKind.Sections);
+			return expect(result2).to.eventually.be.rejectedWith(InsightError);
+		});
+
 
 		it("should reject a dataset without valid sections", async function () {
 			let a3 = await getContentFromArchives("courses.zip");
@@ -211,6 +218,56 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 	});
+	describe("persistence", function () {
+		let sections: string;
+		let facade: InsightFacade;
+
+		// Setup: Execute before all tests in this suite
+		before(async function () {
+			sections = await getContentFromArchives("dataset.zip");
+		});
+
+		// Setup: Execute before each test in this suite
+		beforeEach(function () {
+			facade = new InsightFacade();
+		});
+
+		// Execution: Test case - it should fulfill with the id of the removed dataset
+		it("should fulfill with the id of the removed dataset persistence", async function () {
+			// Add a dataset initially
+			await facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
+			await facade.addDataset("abc", sections, InsightDatasetKind.Sections);
+			let facade3 = new InsightFacade();
+			let items = await facade3.listDatasets();
+			console.log(".....");
+			const item = await facade3.removeDataset("ubc");
+			// Remove the dataset and validate that the promise fulfills with the correct id
+			// const result = await facade.removeDataset("ubc");
+			return expect(item).to.equal("ubc");
+		});
+
+		it("should fulfill with the list datasets persistence", async function () {
+			// Add a dataset initially
+			await facade.addDataset("ubc", sections, InsightDatasetKind.Sections);
+			await facade.addDataset("abc", sections, InsightDatasetKind.Sections);
+			let facade3 = new InsightFacade();
+			let items = await facade3.listDatasets();
+			expect(items).to.have.lengthOf(2);
+			expect(items).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
+			expect(items).to.deep.include({id: "abc", kind: InsightDatasetKind.Sections, numRows: 307});
+		});
+
+
+		// Execution: Test case - it should reject with NotFoundError if removing a non-existent dataset
+		// it("should reject with NotFoundError if removing a non-existent dataset", function () {
+		// 	const result = facade.removeDataset("nonExistentID");
+		// 	return expect(result).to.eventually.be.rejectedWith(NotFoundError);
+		// });
+		// Cleanup: Execute after each test in this suite
+		afterEach(async function () {
+			await clearDisk();
+		});
+	});
 
 	describe("listDatasets", function () {
 		let sections: string;
@@ -284,7 +341,6 @@ describe("InsightFacade", function () {
 					try {
 
 						const result = await facade.performQuery(test.input);
-						console.log(result);
 						expect(result).to.have.deep.members(test.expected);
 						expect(result).to.have.length(test.expected.length);
 					} catch (err) {
