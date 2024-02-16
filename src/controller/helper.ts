@@ -205,38 +205,35 @@ export class QueryHelper {
 	}
 
 	public buildConditionString(filter: any, allIDs: Set<string>): string {
-		// Destructure the filter object
-		const [operator, operand] = Object.entries(filter)[0];
+		const operator: string = Object.keys(filter)[0];
+		const operand: any = filter[operator];
 
-		// Validate input
-		if (!operator || !operand) {
-			throw new Error("Invalid filter object");
-		}
-
-		// Extract key-value pairs safely
-		const [idSuffixKey, value] = Object.entries(operand)[0];
-		const [id, suffix] = idSuffixKey.split("_");
+		// Extract the key and value from the operand
+		const [id, suffix] = Object.keys(operand)[0].split("_");
+		const value: string | number = operand[`${id}_${suffix}`];
 
 		// Check if the ID prefix is valid
 		if (!allIDs.has(id)) {
 			throw new Error(`Invalid ID prefix ${id}`);
 		}
+		// CITATION OF THIS WILDCARD REGEX :https://stackoverflow.com/questions/52143451/javascript-filter-with-wildcard
+		if (operator === "IS" && typeof value === "string" && value.includes("*")) {
+			const a = value.replace(/\*/g, ".*"); // Replace * with .* in the value
+			return `new RegExp('^${a}$').test(${suffix})`; // Construct regex test condition
+		}
 
 		// Build the condition string based on the operator
 		switch (operator) {
 			case "IS":
-				// Check for wildcard string
-				if (typeof value === "string" && value.includes("*")) {
-					const regex = value.replace(/\*/g, ".*");
-					return `new RegExp('^${regex}$').test(${suffix})`;
-				}
 				return `${suffix} === "${value}"`;
 			case "GT":
+				return `${suffix} > ${value}`;
 			case "LT":
+				return `${suffix} < ${value}`;
 			case "EQ":
-				return `${suffix} ${operator} ${value}`;
+				return `${suffix} === ${value}`;
 			default:
-				throw new Error(`Invalid operator ${operator}`);
+				throw new InsightError(`Invalid operator ${operator}`);
 		}
 	}
 
@@ -287,7 +284,7 @@ export class QueryHelper {
 			// Call the dynamically created function with the item and get the result
 			const result = evaluator(item);
 			// Convert the result to a boolean value
-			return result;
+			return !!result; // Use double negation to convert to boolean
 		} catch (error) {
 			console.error("Error evaluating condition:", error);
 			return false; // Return false if there's an error evaluating the condition
