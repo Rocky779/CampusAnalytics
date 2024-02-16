@@ -54,9 +54,6 @@ export default class InsightFacade implements IInsightFacade {
 	 * @returns A promise that resolves to an array of the current dataset IDs upon success.
 	 */
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		// if(await this.isDatasetIdFileExists(id)){
-		// 	return Promise.reject(new InsightError("ERROR"));
-		// }
 		await this.loadDatasetIds();
 		if (this.isEntryInValid(id, content, kind)) {
 			return Promise.reject(new InsightError("ERROR"));
@@ -116,16 +113,6 @@ export default class InsightFacade implements IInsightFacade {
 		);
 	}
 
-	private async isDatasetIdFileExists(id: string): Promise<boolean> {
-		const filePath = path.join("data", `${id}.json`);
-		try {
-			await fs.promises.access(filePath, fs.constants.F_OK);
-			await this.loadDatasetIds();
-			return Promise.reject(new InsightError("ERROR"));
-		} catch (error) {
-			return false; // File does not exist or other error occurred
-		}
-	}
 
 	private checkValidSectionParameterKind(section: any) {
 		return (
@@ -134,7 +121,7 @@ export default class InsightFacade implements IInsightFacade {
 			typeof section.Title === "string" &&
 			typeof section.Professor === "string" &&
 			typeof section.Subject === "string" &&
-			typeof section.Year === "string" && // Updated year check
+			typeof section.Year === "string" &&
 			typeof section.Avg === "number" &&
 			typeof section.Pass === "number" &&
 			typeof section.Fail === "number" &&

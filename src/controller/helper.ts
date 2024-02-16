@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import {InsightError} from "./IInsightFacade"; // Import the 'fs' module for file operations
 // QueryHelper.ts
-
+const VALID_SUFFIXES = new Set(["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"]);
 export class QueryHelper {
 	public async checkIDExists(id: string): Promise<boolean> {
 		const filePath = `data/${id}.json`;
@@ -68,9 +68,15 @@ export class QueryHelper {
 	}
 
 	public isValidSuffix(suffix: string): boolean {
-		// Check if the suffix is one of the specified values
-		const validSuffixes = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
-		return validSuffixes.includes(suffix);
+		// Convert suffix to lowercase for case-insensitive comparison
+		const lowerCaseSuffix = suffix.toLowerCase();
+
+		// Check if the suffix is in the set of valid suffixes
+		if (!VALID_SUFFIXES.has(lowerCaseSuffix)) {
+			throw new InsightError(`Invalid suffix: ${suffix}`);
+		}
+
+		return true;
 	}
 
 	public isValidISFilter(filter: any): boolean {
@@ -199,35 +205,38 @@ export class QueryHelper {
 	}
 
 	public buildConditionString(filter: any, allIDs: Set<string>): string {
-		const operator: string = Object.keys(filter)[0];
-		const operand: any = filter[operator];
+		// Destructure the filter object
+		const [operator, operand] = Object.entries(filter)[0];
 
-		// Extract the key and value from the operand
-		const [id, suffix] = Object.keys(operand)[0].split("_");
-		const value: string | number = operand[`${id}_${suffix}`];
+		// Validate input
+		if (!operator || !operand) {
+			throw new Error("Invalid filter object");
+		}
+
+		// Extract key-value pairs safely
+		const [idSuffixKey, value] = Object.entries(operand)[0];
+		const [id, suffix] = idSuffixKey.split("_");
 
 		// Check if the ID prefix is valid
 		if (!allIDs.has(id)) {
 			throw new Error(`Invalid ID prefix ${id}`);
 		}
-		// CITATION OF THIS WILDCARD REGEX :https://stackoverflow.com/questions/52143451/javascript-filter-with-wildcard
-		if (operator === "IS" && typeof value === "string" && value.includes("*")) {
-			const a = value.replace(/\*/g, ".*"); // Replace * with .* in the value
-			return `new RegExp('^${a}$').test(${suffix})`; // Construct regex test condition
-		}
 
 		// Build the condition string based on the operator
 		switch (operator) {
 			case "IS":
+				// Check for wildcard string
+				if (typeof value === "string" && value.includes("*")) {
+					const regex = value.replace(/\*/g, ".*");
+					return `new RegExp('^${regex}$').test(${suffix})`;
+				}
 				return `${suffix} === "${value}"`;
 			case "GT":
-				return `${suffix} > ${value}`;
 			case "LT":
-				return `${suffix} < ${value}`;
 			case "EQ":
-				return `${suffix} === ${value}`;
+				return `${suffix} ${operator} ${value}`;
 			default:
-				throw new InsightError(`Invalid operator ${operator}`);
+				throw new Error(`Invalid operator ${operator}`);
 		}
 	}
 
