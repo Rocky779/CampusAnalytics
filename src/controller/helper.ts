@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import {InsightError} from "./IInsightFacade"; // Import the 'fs' module for file operations
 // QueryHelper.ts
-
+const VALID_SUFFIXES = new Set(["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"]);
 export class QueryHelper {
 	public async checkIDExists(id: string): Promise<boolean> {
 		const filePath = `data/${id}.json`;
@@ -68,10 +68,17 @@ export class QueryHelper {
 	}
 
 	public isValidSuffix(suffix: string): boolean {
-		// Check if the suffix is one of the specified values
-		const validSuffixes = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
-		return validSuffixes.includes(suffix);
+		// Convert suffix to lowercase for case-insensitive comparison
+		const lowerCaseSuffix = suffix.toLowerCase();
+
+		// Check if the suffix is in the set of valid suffixes
+		if (!VALID_SUFFIXES.has(lowerCaseSuffix)) {
+			throw new InsightError(`Invalid suffix: ${suffix}`);
+		}
+
+		return true;
 	}
+
 
 	public isValidISFilter(filter: any): boolean {
 		// Check if IS filter is an object with a single key-value pair
