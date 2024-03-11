@@ -48,29 +48,7 @@ export class CustomRoomsDatasetHelper {
 				combinedInfo = combinedInfo.concat(combined);
 				// Perform additional validation or processing as needed with combinedInfo
 			} else {
-				// Handle case where no room table is found for the building
-				// Assuming these are your default values
-				// const defaultRoomNumber = "";
-				// const defaultCapacity = 0;
-				// const defaultType = "";
-				// const defaultFurniture = "";
-				// const defaultLink = "";
-				// const geolocation = await this.roomsDatasetHelper.fetchGeolocation(buildingInfo.address);
-				// const room = new Room(
-				// 	buildingInfo.name, // Full name of the building
-				// 	buildingInfo.code, // Short name of the building
-				// 	defaultRoomNumber, // Default room number
-				// 	`${buildingInfo.code}_${defaultRoomNumber}`, // Concatenated default name of the building and default room number
-				// 	buildingInfo.address, // Address of the building
-				// 	geolocation?.latitude ?? 0, // Latitude of the building's location (default to 0 if undefined)
-				// 	geolocation?.longitude ?? 0, // Longitude of the building's location (default to 0 if undefined)
-				// 	defaultCapacity, // Default room capacity
-				// 	defaultType, // Default room type
-				// 	defaultFurniture, // Default furniture in the room
-				// 	defaultLink // Default link associated with the room
-				// );
 				//
-				// combinedInfos.push(room);
 			}
 		});
 
@@ -249,44 +227,50 @@ export class CustomRoomsDatasetHelper {
 
 	private async combineBuildingAndRoomInfo(buildingInfo: any, roomInfos: any[]): Promise<Room[]> {
 		const combinedInfo: Room[] = [];
-		const geolocation = await this.roomsDatasetHelper.fetchGeolocation(buildingInfo.address);
-			// Loop through each room info and create a new Room instance
-		for (const roomInfo of roomInfos) {
-				// Combine building info with room info
-			const fullName = buildingInfo.name;
-			const shortName = buildingInfo.code;
-			const address = buildingInfo.address;
 
-			const {
-				number,
-				capacity,
-				type,
-				furniture,
-				link
-			} = roomInfo;
-			const name = shortName + "_" + number;
+		// Fetch geolocation once for the building
+		const geolocation = await this.roomsDatasetHelper.fetchGeolocation(buildingInfo.address);
+		// If geolocation has lat and lon defined
+		if (geolocation.lat !== undefined && geolocation.lon !== undefined) {
+			// Loop through each room info and create a new Room instance
+			for (const roomInfo of roomInfos) {
+				// Combine building info with room info
+				const fullName = buildingInfo.name;
+				const shortName = buildingInfo.code;
+				const address = buildingInfo.address;
+
+				const {
+					number,
+					capacity,
+					type,
+					furniture,
+					link
+				} = roomInfo;
+				const name = shortName + "_" + number;
 
 				// Create a new Room instance
-			const room = new Room(
-				fullName,
-				shortName,
-				number,
-				name, // Concatenate building name and room number for the name
-				address,
-				geolocation.lat ?? -1,
-				geolocation.lon ?? -1,
-				capacity,
-				type,
-				furniture,
-				link
-			);
+				const room = new Room(
+					fullName,
+					shortName,
+					number,
+					name, // Concatenate building name and room number for the name
+					address,
+					geolocation.lat,
+					geolocation.lon,
+					capacity,
+					type,
+					furniture,
+					link
+				);
 
 				// Add the new Room instance to the combinedInfo array
-			combinedInfo.push(room);
+				combinedInfo.push(room);
+			}
 		}
 
 		return combinedInfo;
 	}
+
 
 	public extractBuildingNames(buildingTable: any): string[] {
 		const buildingNames: string[] = [];

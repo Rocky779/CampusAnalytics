@@ -22,7 +22,6 @@ export class GeolocationFetcher {
 				res.on("end", () => {
 					try {
 						const parsedData = JSON.parse(rawData);
-						console.log(parsedData);
 						// if (parsedData.lat !== undefined && parsedData.lon !== undefined) {
 						// 	// Resolve with latitude and longitude
 						// 	resolve({latitude: parsedData.lat, longitude: parsedData.lon});
@@ -33,7 +32,7 @@ export class GeolocationFetcher {
 						// 	// Reject with invalid response format error
 						// 	reject(new InsightError("Invalid response format"));
 						// }
-						return Promise.resolve(parsedData);
+						resolve(parsedData);
 					} catch (error) {
 						// Reject with JSON parsing error
 						reject(new InsightError("wrong"));

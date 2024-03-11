@@ -23,6 +23,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe("InsightFacade", function () {
+	this.timeout(5000); // Timeout set to 5 seconds (5000 milliseconds)
 	describe("addDataset", function () {
 		let sections: string;
 		let facade: InsightFacade;
@@ -160,7 +161,7 @@ describe("InsightFacade", function () {
 		// Cleanup: Execute after each test in this suite
 		afterEach(async function () {
 			// Clear the disk to ensure a fresh state for each test
-			await clearDisk();
+			// await clearDisk();
 		});
 	});
 	describe("removeDataset", function () {
