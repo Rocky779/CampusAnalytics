@@ -1,7 +1,10 @@
 import * as fs from "fs";
 import {InsightError} from "./IInsightFacade"; // Import the 'fs' module for file operations
 // QueryHelper.ts
-const VALID_SUFFIXES = new Set(["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"]);
+// Set of valid suffixes used for checking the validity of suffixes in
+// various contexts. Used to see whether a suffix is one of the following
+const VALID_SUFFIXES = new Set(["avg", "pass", "fail", "audit", "year",
+	"dept", "id", "instructor", "title", "uuid"]);
 export class QueryHelper {
 	public async checkIDExists(id: string): Promise<boolean> {
 		const filePath = `data/${id}.json`;
