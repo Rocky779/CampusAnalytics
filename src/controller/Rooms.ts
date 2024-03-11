@@ -10,7 +10,7 @@ export class Room {
 	private readonly type: string;
 	private readonly furniture: string;
 	private readonly href: string;
-
+// constructor
 	constructor(
 		fullname: string = "",
 		shortname: string = "",
