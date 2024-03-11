@@ -1,38 +1,49 @@
 import {InsightError} from "./IInsightFacade";
 import {parse} from "parse5";
 import JSZip from "jszip";
-
+const http = require("http");
 
 export class GeolocationFetcher {
-	public async fetchGeolocation(buildingAddress: string) {
-		try {
-			// Encode the address for URL
-			const encodedAddress = encodeURIComponent(buildingAddress);
-			// Send GET request to the API endpoint
-			const response = await fetch(`http://cs310.students.cs.ubc.ca:11316/api/v1/project_team067/
-			${encodedAddress}`);
-			// Check if the request was successful
-			if (!response.ok) {
-				throw new Error("Failed to fetch geolocation");
-			}
+	public async fetchGeolocation(address: string): Promise<any> {
+		return new Promise((resolve, reject) => {
+			let addressEncoded = encodeURIComponent(address);
+			let apiURL = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team067/${addressEncoded}`;
 
-			// Parse the JSON response
-			const data = await response.json();
+			http.get(apiURL, (res: any) => {
+				res.setEncoding("utf8");
+				let rawData = "";
 
-			// Check if the response contains lat and lon properties
-			if (data.lat !== undefined && data.lon !== undefined) {
-				// Geolocation successfully retrieved
-				return {latitude: data.lat, longitude: data.lon};
-			} else if (data.error) {
-				// Error occurred
-				throw new Error(data.error);
-			} else {
-				throw new Error("Invalid response format");
-			}
-		} catch (error) {
-			// Handle errors
-			return null;
-		}
+				// Concatenate received data chunks
+				res.on("data", (chunk: any) => {
+					rawData += chunk;
+				});
+
+				// Once the response ends
+				res.on("end", () => {
+					try {
+						const parsedData = JSON.parse(rawData);
+						if (parsedData.lat !== undefined && parsedData.lon !== undefined) {
+							// Resolve with latitude and longitude
+							resolve({latitude: parsedData.lat, longitude: parsedData.lon});
+						} else if (parsedData.error) {
+							// Reject with error message if an error occurred
+							reject(new InsightError(parsedData.error));
+						} else {
+							// Reject with invalid response format error
+							reject(new InsightError("Invalid response format"));
+						}
+					} catch (error) {
+						// Reject with JSON parsing error
+						reject(new InsightError("wrong"));
+					}
+				});
+
+				// Handle HTTP request errors
+				res.on("error", (error: any) => {
+					reject(new InsightError("wrong"));
+				});
+			});
+		});
 	}
 
 	public fetchAddress(buildingName: string, tableNode: any): string {
