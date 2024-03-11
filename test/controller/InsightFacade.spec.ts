@@ -23,6 +23,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe("InsightFacade", function () {
+	this.timeout(5000); // Timeout set to 5 seconds (5000 milliseconds)
 	describe("addDataset", function () {
 		let sections: string;
 		let facade: InsightFacade;
