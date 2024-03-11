@@ -152,7 +152,7 @@ export default class InsightFacade implements IInsightFacade {
 			}
 
 			// Validate WHERE clause
-			const allIDs: Set<string > = new Set<string>();
+			const allIDs: Set<string> = new Set<string>();
 			const isValidWhere = this.queryHelper.isValidWhereClause(query.WHERE, allIDs);
 			if (!isValidWhere) {
 				return Promise.reject(new InsightError("Invalid WHERE clause."));
