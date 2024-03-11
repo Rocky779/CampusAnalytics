@@ -104,6 +104,13 @@ describe("InsightFacade", function () {
 			// Validation: Assert that the result is rejected with InsightError
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
+		it("rooms", async function () {
+			let a04 = await getContentFromArchives("campus.zip");
+			// Execute the addDataset method with an empty dataset id and invalid arguments
+			const result = facade.addDataset("abc", a04, InsightDatasetKind.Rooms);
+			// Validation: Assert that the result is rejected with InsightError
+			return expect(result).to.eventually.have.members(["abc"]);
+		});
 		it("should reject a dataset with invalid structure", async function () {
 			let a5 = await getContentFromArchives("wanga.zip");
 			// Execute the addDataset method with an empty dataset id and invalid arguments
@@ -131,6 +138,11 @@ describe("InsightFacade", function () {
 		// Execution: Test case - it should reject with a dataset id consisting of only whitespace characters
 		it("should reject with a dataset id consisting of only whitespace characters", function () {
 			const result = facade.addDataset("   ", sections, InsightDatasetKind.Sections);
+			return expect(result).to.eventually.be.rejectedWith(InsightError);
+		});
+		it("should reject with a dataset rooms", async function () {
+			let a8 = await getContentFromArchives("ezyzip1.zip");
+			const result = facade.addDataset("   ", a8, InsightDatasetKind.Rooms);
 			return expect(result).to.eventually.be.rejectedWith(InsightError);
 		});
 
