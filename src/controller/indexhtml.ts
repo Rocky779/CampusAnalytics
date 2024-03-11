@@ -2,9 +2,9 @@ import {InsightError} from "./IInsightFacade";
 import {parse} from "parse5";
 import JSZip from "jszip";
 const http = require("http");
-
+import {GeoResponse} from "./response";
 export class GeolocationFetcher {
-	public async fetchGeolocation(address: string): Promise<any> {
+	public async fetchGeolocation(address: string): Promise<GeoResponse> {
 		return new Promise((resolve, reject) => {
 			let addressEncoded = encodeURIComponent(address);
 			let apiURL = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team067/${addressEncoded}`;
@@ -22,16 +22,18 @@ export class GeolocationFetcher {
 				res.on("end", () => {
 					try {
 						const parsedData = JSON.parse(rawData);
-						if (parsedData.lat !== undefined && parsedData.lon !== undefined) {
-							// Resolve with latitude and longitude
-							resolve({latitude: parsedData.lat, longitude: parsedData.lon});
-						} else if (parsedData.error) {
-							// Reject with error message if an error occurred
-							reject(new InsightError(parsedData.error));
-						} else {
-							// Reject with invalid response format error
-							reject(new InsightError("Invalid response format"));
-						}
+						console.log(parsedData);
+						// if (parsedData.lat !== undefined && parsedData.lon !== undefined) {
+						// 	// Resolve with latitude and longitude
+						// 	resolve({latitude: parsedData.lat, longitude: parsedData.lon});
+						// } else if (parsedData.error) {
+						// 	// Reject with error message if an error occurred
+						// 	reject(new InsightError(parsedData.error));
+						// } else {
+						// 	// Reject with invalid response format error
+						// 	reject(new InsightError("Invalid response format"));
+						// }
+						return Promise.resolve(parsedData);
 					} catch (error) {
 						// Reject with JSON parsing error
 						reject(new InsightError("wrong"));
@@ -289,7 +291,7 @@ export class GeolocationFetcher {
 		}
 		let buildingAddress = this.fetchAddress(buildingName,buildingTable);
 		let geolocation = await this.fetchGeolocation(buildingAddress);
-		if (!geolocation){
+		if (geolocation.error !== undefined){
 			return Promise.reject(new InsightError("No valid room table found in building file:"));
 		}
 		return Promise.resolve(true);

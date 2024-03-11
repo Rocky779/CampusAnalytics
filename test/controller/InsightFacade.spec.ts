@@ -160,7 +160,7 @@ describe("InsightFacade", function () {
 		// Cleanup: Execute after each test in this suite
 		afterEach(async function () {
 			// Clear the disk to ensure a fresh state for each test
-			// await clearDisk();
+			await clearDisk();
 		});
 	});
 	describe("removeDataset", function () {

@@ -4,6 +4,7 @@ import JSZip from "jszip";
 import {parse} from "parse5";
 import {RoomsDatasetHelper} from "./RoomDatasetHelper";
 import {GeolocationFetcher} from "./indexhtml";
+import {GeoResponse} from "./response";
 
 export class CustomRoomsDatasetHelper {
 	private roomsDatasetHelper: GeolocationFetcher;
@@ -248,10 +249,9 @@ export class CustomRoomsDatasetHelper {
 	private async combineBuildingAndRoomInfo(buildingInfo: any, roomInfos: any[]): Promise<Room[]> {
 		const combinedInfo: Room[] = [];
 		const geolocation = await this.roomsDatasetHelper.fetchGeolocation(buildingInfo.address);
-
-		// Loop through each room info and create a new Room instance
+			// Loop through each room info and create a new Room instance
 		for (const roomInfo of roomInfos) {
-			// Combine building info with room info
+				// Combine building info with room info
 			const fullName = buildingInfo.name;
 			const shortName = buildingInfo.code;
 			const address = buildingInfo.address;
@@ -265,22 +265,22 @@ export class CustomRoomsDatasetHelper {
 			} = roomInfo;
 			const name = shortName + "_" + number;
 
-			// Create a new Room instance
+				// Create a new Room instance
 			const room = new Room(
 				fullName,
 				shortName,
 				number,
 				name, // Concatenate building name and room number for the name
 				address,
-				geolocation?.latitude,
-				geolocation?.longitude,
+				geolocation.lat ?? -1,
+				geolocation.lon ?? -1,
 				capacity,
 				type,
 				furniture,
 				link
 			);
 
-			// Add the new Room instance to the combinedInfo array
+				// Add the new Room instance to the combinedInfo array
 			combinedInfo.push(room);
 		}
 
