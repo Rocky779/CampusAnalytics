@@ -13,6 +13,7 @@ export class CustomRoomsDatasetHelper {
 		this.roomsDatasetHelper = new GeolocationFetcher();
 	}
 
+// hello
 	public async createDataset(decodedContent: JSZip): Promise<any[]> {
 		const indexHtml = decodedContent.file("index.htm");
 		if (!indexHtml) {
