@@ -5,12 +5,13 @@ const http = require("http");
 import {GeoResponse} from "./response";
 export class GeolocationFetcher {
 	public async fetchGeolocation(address: string): Promise<GeoResponse> {
+		// CITATION: https://stackoverflow.com/questions/66405338/facing-error-while-making-a-request-method-using-typescript
+		// Got some more ideas on how to understand get requests from http (getting raw data in chunks and parsing it later) and  this get function better from ChatGPT AND mentioned stack overflows
+		// https://stackoverflow.com/questions/45748476/http-request-in-typescript
 		return new Promise((resolve, reject) => {
 			let addressEncoded = encodeURIComponent(address);
-			let apiURL = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team067/${addressEncoded}`;
-
-			http.get(apiURL, (res: any) => {
-				res.setEncoding("utf8");
+			let api = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team067/${addressEncoded}`;
+			http.get(api, (res: any) => {
 				let rawData = "";
 
 				// Concatenate received data chunks
@@ -21,18 +22,8 @@ export class GeolocationFetcher {
 				// Once the response ends
 				res.on("end", () => {
 					try {
-						const parsedData = JSON.parse(rawData);
-						// if (parsedData.lat !== undefined && parsedData.lon !== undefined) {
-						// 	// Resolve with latitude and longitude
-						// 	resolve({latitude: parsedData.lat, longitude: parsedData.lon});
-						// } else if (parsedData.error) {
-						// 	// Reject with error message if an error occurred
-						// 	reject(new InsightError(parsedData.error));
-						// } else {
-						// 	// Reject with invalid response format error
-						// 	reject(new InsightError("Invalid response format"));
-						// }
-						resolve(parsedData);
+						const data = JSON.parse(rawData);
+						resolve(data);
 					} catch (error) {
 						// Reject with JSON parsing error
 						reject(new InsightError("wrong"));
@@ -41,7 +32,7 @@ export class GeolocationFetcher {
 
 				// Handle HTTP request errors
 				res.on("error", (error: any) => {
-					reject(new InsightError("wrong"));
+					reject(new InsightError("wrong" + error));
 				});
 			});
 		});

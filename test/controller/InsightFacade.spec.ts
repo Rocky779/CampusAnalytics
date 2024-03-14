@@ -337,8 +337,8 @@ describe("InsightFacade", function () {
 
 		before(async function () {
 			facade = new InsightFacade();
-			sections = await getContentFromArchives("pair.zip");
-			await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+			sections = await getContentFromArchives("campus.zip");
+			await facade.addDataset("rooms", sections, InsightDatasetKind.Rooms);
 		});
 
 		describe("valid queries", function () {

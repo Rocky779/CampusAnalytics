@@ -1,11 +1,12 @@
 import * as fs from "fs";
 import {InsightError} from "./IInsightFacade"; // Import the 'fs' module for file operations
-// QueryHelper.ts
-// Set of valid suffixes used for checking the validity of suffixes in
-// various contexts. Used to see whether a suffix is one of the following
-const VALID_SUFFIXES = new Set(["avg", "pass", "fail", "audit", "year",
-	"dept", "id", "instructor", "title", "uuid"]);
+const VALID_SUFFIXES = ["avg", "pass", "fail", "audit", "year",
+	"dept", "id", "instructor", "title", "uuid","lat" , "lon" ,"seats", "fullname" , "shortname" , "number" , "name" ,
+	"address" , "type" , "furniture" , "href"];
+const validOperators = ["LT", "GT", "EQ", "IS", "AND", "OR", "NOT"];
 export class QueryHelper {
+	private columns: string[] = [];
+	private columns2: string[] = [];
 	public async checkIDExists(id: string): Promise<boolean> {
 		const filePath = `data/${id}.json`;
 		try {
@@ -17,16 +18,15 @@ export class QueryHelper {
 	}
 
 	public isValidWhereClause(where: any, allIDs: Set<string>): boolean {
-		// Check if WHERE is an object
+		this.columns = [];
 		if (!(where && typeof where === "object")) {
 			return false;
 		}
-		const validOperators = ["LT", "GT", "EQ", "IS", "AND", "OR", "NOT"];
+		// const validOperators = ["LT", "GT", "EQ", "IS", "AND", "OR", "NOT"];
 		const operator = Object.keys(where)[0];
 		if (!validOperators.includes(operator)) {
 			return false;
 		}
-
 		// Validate the WHERE clause based on the operator
 		let leafKey, prefix, suffix;
 		leafKey = Object.keys(where[operator])[0];
@@ -75,7 +75,7 @@ export class QueryHelper {
 		const lowerCaseSuffix = suffix.toLowerCase();
 
 		// Check if the suffix is in the set of valid suffixes
-		if (!VALID_SUFFIXES.has(lowerCaseSuffix)) {
+		if (!VALID_SUFFIXES.includes(lowerCaseSuffix)) {
 			throw new InsightError(`Invalid suffix: ${suffix}`);
 		}
 
@@ -104,7 +104,6 @@ export class QueryHelper {
 				return false;
 			}
 		}
-
 		return true;
 	}
 
@@ -128,26 +127,36 @@ export class QueryHelper {
 		) {
 			return false;
 		}
-
+		const validColumns = options.COLUMNS.filter((column: string) => column.includes("_"));
+		const invalidColumns = options.COLUMNS.filter((column: string) => !column.includes("_"));
+		console.log(validColumns);
+		this.columns.push(...invalidColumns);
+		console.log(allIDs);
 		// Check if each column is a valid string
-		for (const column of options.COLUMNS) {
+		for (const column of validColumns) {
 			if (typeof column !== "string" || !this.isValidColumn(column, allIDs)) {
 				return false;
+			} else{
+				this.columns.push(column);
+				// console.log(this.columns);
 			}
 		}
 
 		// Check if ORDER property exists and is a valid string
-		if (options.ORDER) {
-			if (typeof options.ORDER !== "string" || !this.isValidColumn(options.ORDER, allIDs)) {
-				return false;
-			}
-		}
+		// if (options.ORDER) {
+		// 	if (typeof options.ORDER !== "string" || !this.isValidColumn(options.ORDER, allIDs)) {
+		// 		return false;
+		// 	}
+		// }
 
 		return true;
 	}
 
 	public isValidColumn(column: string, allIDs: Set<string>): boolean {
 		// Check if column follows the specified format
+		// if(!column.includes("_")){
+		// 	return true;
+		// }
 		const columnParts = column.split("_");
 		if (columnParts.length !== 2) {
 			return false;
@@ -156,16 +165,24 @@ export class QueryHelper {
 		const [prefix, suffix] = columnParts;
 
 		// Check if the prefix (id) exists in the allIDs set
+		if (allIDs.size === 0) {
+			// Add the prefix to all IDs
+			// Assuming `prefix` is a string
+			// Here I'm assuming `prefix` is added to each ID as a prefix
+			// You can adjust this according to your specific requirements
+			allIDs.add(prefix);
+		}
 		if (!allIDs.has(prefix)) {
 			return false;
 		}
 
 		// Check if the suffix is a valid field
-		const validSuffixes = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
-		if (!validSuffixes.includes(suffix)) {
-			return false;
-		}
-		return true;
+		const validSuffixes = ["avg", "pass", "fail", "audit", "year",
+			"dept", "id", "instructor", "title", "uuid","lat" , "lon" ,"seats", "fullname" ,
+			"shortname" , "number" , "name" ,
+			"address" , "type" , "furniture" , "href"];
+		return validSuffixes.includes(suffix);
+
 	}
 
 	public traverseWhereClause(where: any, allIDs: Set<string>): string {
@@ -265,11 +282,7 @@ export class QueryHelper {
 	}
 
 	public preprocessCondition(item: any, condition: string): string {
-		// Define an array of field names to be replaced
-		const fieldNames = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
-
-		// Replace each field name with "item.fieldName"
-		for (const fieldName of fieldNames) {
+		for (const fieldName of VALID_SUFFIXES) {
 			// CITATION: regex provided by chatGPT
 			const regex = new RegExp(`\\b${fieldName}\\b`, "g");
 			condition = condition.replace(regex, `item.${fieldName}`);
@@ -289,19 +302,33 @@ export class QueryHelper {
 			// Convert the result to a boolean value
 			return !!result; // Use double negation to convert to boolean
 		} catch (error) {
-			console.error("Error evaluating condition:", error);
+			// console.error("Error evaluating condition:", error);
 			return false; // Return false if there's an error evaluating the condition
 		}
 	}
 
-	public traverseOptions(items: any[], queryOptions: any): any[] {
+	public traverseOptions(items: any[], queryOptions: any, hasTransformations: boolean, allIDs: Set<string>): any[] {
 		if (!queryOptions.COLUMNS) {
 			throw new Error("COLUMNS property is required in OPTIONS.");
 		}
 
-		const requestedFields: string[] = queryOptions.COLUMNS;
+		// Get the first ID from allIDs
+		const idPrefix = Array.from(allIDs)[0];
 
-		// Filter out items to include only the requested fields
+		// If transformations exist, return items with ID suffix connected in front of each key
+		if (hasTransformations) {
+			const transformedItems = items.map((item: any) => {
+				const transformedItem: any = {};
+				for (const key in item) {
+					transformedItem[`${idPrefix}_${key}`] = item[key];
+				}
+				return transformedItem;
+			});
+			return transformedItems;
+		}
+
+		// If no transformations, filter out items to include only the requested fields
+		const requestedFields: string[] = queryOptions.COLUMNS.filter((column: string) => column.includes("_"));
 		const filteredItems = items.map((item: any) => {
 			const filteredItem: any = {};
 			requestedFields.forEach((field: string) => {
@@ -310,19 +337,62 @@ export class QueryHelper {
 			});
 			return filteredItem;
 		});
-		if (queryOptions.ORDER) {
-			const orderField: string = queryOptions.ORDER;
-			filteredItems.sort((a: any, b: any) => {
-				if (a[orderField] < b[orderField]) {
-					return -1;
-				} else if (a[orderField] > b[orderField]) {
-					return 1;
-				} else {
-					return 0;
-				}
-			});
-		}
 
 		return filteredItems;
+	}
+
+	public isValidTransformations(transformation: any, allIDs: Set<string>): boolean {
+		if (!transformation || typeof transformation !== "object" || !transformation.GROUP || !transformation.APPLY) {
+			return false; // Transformation object or GROUP key not found
+		}
+		if (!Array.isArray(transformation.GROUP) || transformation.GROUP.length === 0) {
+			return false; // GROUP must be a non-empty array
+		}
+		for (const groupItem of transformation.GROUP) {
+			if (!this.columns.includes(groupItem)) {
+				return false; // GROUP item not found in COLUMNS
+			}
+		}
+		for (const applyItem of transformation.APPLY) {
+			const applyKey = Object.keys(applyItem)[0]; // Get the key of the APPLY item
+			if (!this.columns.includes(applyKey)) {
+				return false; // APPLY key not found in COLUMNS
+			}
+			const applyValue = applyItem[applyKey];
+			if (typeof applyValue !== "object" || Object.keys(applyValue).length !== 1) {
+				return false; // APPLY value should be an object with exactly one key-value pair
+			}
+			const aggregationFunc = Object.keys(applyValue)[0]; // Get the aggregation function (MAX, MIN, AVG, COUNT, SUM)
+			const fieldName = applyValue[aggregationFunc]; // Get the field name
+			const [id, suffix] = fieldName.split("_"); // Split the field name into ID and suffix
+			if (!(allIDs.has(id) && VALID_SUFFIXES.includes(suffix)) ||
+				!["MAX", "MIN", "AVG", "COUNT", "SUM"].includes(aggregationFunc)) {
+				return false; // ID or suffix is invalid or aggregation function is invalid
+			}
+		}
+		return true; // All checks passed
+	}
+
+	public addAdditionalColumnsToAggregatedResults
+	(aggregatedGroups: any[], groups: any[]): any[] {
+		const resultsWithAdditionalColumns: any[] = [];
+
+		for (let i = 0; i < aggregatedGroups.length; i++) {
+			const aggregatedGroup = aggregatedGroups[i];
+			const group = groups[i];
+
+			const resultWithAdditionalColumns: any = {...aggregatedGroup}; // Copy the aggregated results
+
+
+			// Add additional columns to the result
+			this.columns.forEach((column) => {
+				if (column.includes("_")) {
+					resultWithAdditionalColumns[column] = group[0][column]; // Assuming the first item in the group has the same value for the additional column
+				}
+			});
+			resultsWithAdditionalColumns.push(resultWithAdditionalColumns);
+		}
+
+		return resultsWithAdditionalColumns;
 	}
 }
