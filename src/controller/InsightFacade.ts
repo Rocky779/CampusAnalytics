@@ -179,7 +179,6 @@ export default class InsightFacade implements IInsightFacade {
 			const items = await this.queryHelper.getMatchingItems(Array.from(allIDs)[0], condString);
 			let wanted = this.queryHelper.traverseOptions(items, query.OPTIONS, false, allIDs);
 			wanted = wanted.filter((item: any) => Object.values(item).every((val: any) => val !== undefined));
-			console.log(wanted);
 
 			// Check if the result is too large
 			if (wanted.length > 5000) {
@@ -188,6 +187,7 @@ export default class InsightFacade implements IInsightFacade {
 
 			if (query.TRANSFORMATIONS !== undefined) {
 				try {
+					console.log(items);
 					wanted = await this.handleTransformations(query, items, allIDs);
 				} catch (error) {
 					return Promise.reject(error);
@@ -218,10 +218,10 @@ export default class InsightFacade implements IInsightFacade {
 
 		let wanted2 = this.queryHelper.traverseOptions(items, query.OPTIONS, true, allIDs);
 		wanted2 = wanted2.filter((item: any) => Object.values(item).every((val: any) => val !== undefined));
+		console.log(wanted2);
 
 		const groupedData = this.dataHelper.groupByMultipleParameters(wanted2, query.TRANSFORMATIONS.GROUP);
 		const extractedArray = this.dataHelper.extractArrays(groupedData);
-		console.log(extractedArray);
 		const operatedGroup = this.dataHelper.applyOperations(extractedArray, query.TRANSFORMATIONS.APPLY);
 		// console.log(operatedGroup);
 		let final = this.queryHelper.addAdditionalColumnsToAggregatedResults(operatedGroup, extractedArray);

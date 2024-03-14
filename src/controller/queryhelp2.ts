@@ -83,7 +83,7 @@ export class DataProcessor {
 						appliedGroup[targetKey] = this.calculateSum(group, sourceKey);
 						break;
 					case "COUNT":
-						appliedGroup[targetKey] = this.calculateCount(group);
+						appliedGroup[targetKey] = this.calculateCount(group,sourceKey);
 						break;
 					default:
 						// Handle unsupported operation types
@@ -105,8 +105,16 @@ export class DataProcessor {
 		return max;
 	}
 
-	public calculateCount(group: any[]): number {
-		return group.length;
+
+	public calculateCount(group: any[], key: string): number {
+		const uniqueValues = new Set();
+		for (const item of group) {
+			// Check if the key exists and is not undefined
+			if (key in item && item[key] !== undefined) {
+				uniqueValues.add(item[key]);
+			}
+		}
+		return uniqueValues.size;
 	}
 
 
