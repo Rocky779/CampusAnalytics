@@ -177,12 +177,6 @@ export default class InsightFacade implements IInsightFacade {
 			const items = await this.queryHelper.getMatchingItems(Array.from(allIDs)[0], condString);
 			let wanted = this.queryHelper.traverseOptions(items, query.OPTIONS, false, allIDs);
 			wanted = wanted.filter((item: any) => Object.values(item).every((val: any) => val !== undefined));
-
-			// Check if the result is too large
-			if (wanted.length > 5000) {
-				return Promise.reject(new ResultTooLargeError("Too big"));
-			}
-
 			if (query.TRANSFORMATIONS !== undefined) {
 				try {
 					wanted = await this.handleTransformations(query, items, allIDs);
@@ -198,7 +192,9 @@ export default class InsightFacade implements IInsightFacade {
 					return Promise.reject(new InsightError("Sorting error"));
 				}
 			}
-			// Return the result
+			if (wanted.length > 5000) {
+				return Promise.reject(new ResultTooLargeError("Too big"));
+			}
 			return Promise.resolve(wanted);
 		} catch (error) {
 			return Promise.reject(new InsightError("Error parsing query JSON."));
