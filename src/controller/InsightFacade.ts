@@ -14,6 +14,8 @@ import path from "node:path";
 import {QueryHelper} from "./helper";
 import {SectionsDatasetHelper} from "./Sectionsdatahelper";
 import {RoomsDatasetHelper} from "./RoomDatasetHelper";
+import {DataProcessor} from "./queryhelp2";
+import * as wasi from "wasi";
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -26,11 +28,13 @@ export default class InsightFacade implements IInsightFacade {
 	private sectionsHelper: SectionsDatasetHelper;
 
 	private roomsHelper: RoomsDatasetHelper;
+	private dataHelper: DataProcessor;
 
 	constructor() {
 		this.queryHelper = new QueryHelper();
 		this.sectionsHelper = new SectionsDatasetHelper(this.datasetIds);
 		this.roomsHelper = new RoomsDatasetHelper(this.datasetIds);
+		this.dataHelper = new DataProcessor();
 		console.log("InsightFacadeImpl::init()");
 	}
 
@@ -120,10 +124,10 @@ export default class InsightFacade implements IInsightFacade {
 				const filePath = path.join(dataFolderPath, `${id}.json`);
 				try {
 					const fileContent = await fs.promises.readFile(filePath, "utf-8");
-					const jsonArray = JSON.parse(fileContent);
+					const parsedData = JSON.parse(fileContent);
 
-					if (Array.isArray(jsonArray) && jsonArray.length > 0) {
-						return jsonArray[0];
+					if (Array.isArray(parsedData) && parsedData.length > 0) {
+						return parsedData[0];
 					} else {
 						return null; // If file content is empty or not an array
 					}
@@ -173,7 +177,7 @@ export default class InsightFacade implements IInsightFacade {
 			// Perform the query
 			const condString = this.queryHelper.traverseWhereClause(query.WHERE, allIDs);
 			const items = await this.queryHelper.getMatchingItems(Array.from(allIDs)[0], condString);
-			let wanted = this.queryHelper.traverseOptions(items, query.OPTIONS);
+			let wanted = this.queryHelper.traverseOptions(items, query.OPTIONS, false, allIDs);
 			wanted = wanted.filter((item: any) => Object.values(item).every((val: any) => val !== undefined));
 
 			// Check if the result is too large
@@ -181,10 +185,61 @@ export default class InsightFacade implements IInsightFacade {
 				return Promise.reject(new ResultTooLargeError("Too big"));
 			}
 
+			if (query.TRANSFORMATIONS !== undefined) {
+				try {
+					wanted = await this.handleTransformations(query, items, allIDs);
+				} catch (error) {
+					return Promise.reject(error);
+				}
+			}
+
+			if (query.OPTIONS.ORDER) {
+				try {
+					wanted = this.dataHelper.sortItems(wanted, query.OPTIONS.ORDER);
+				} catch (error) {
+					return Promise.reject(new InsightError("Sorting error"));
+				}
+			}
+
+			console.log(wanted);
 			// Return the result
 			return Promise.resolve(wanted);
 		} catch (error) {
 			return Promise.reject(new InsightError("Error parsing query JSON."));
 		}
 	}
+
+	private async handleTransformations(query: any, items: any[], allIDs: Set<string>): Promise<any[]> {
+		const transExists = this.queryHelper.isValidTransformations(query.TRANSFORMATIONS, allIDs);
+		if (!transExists) {
+			throw new InsightError("Incorrect transformations.");
+		}
+
+		let wanted2 = this.queryHelper.traverseOptions(items, query.OPTIONS, true, allIDs);
+		wanted2 = wanted2.filter((item: any) => Object.values(item).every((val: any) => val !== undefined));
+
+		const groupedData = this.dataHelper.groupByMultipleParameters(wanted2, query.TRANSFORMATIONS.GROUP);
+		const extractedArray = this.dataHelper.extractArrays(groupedData);
+		const operatedGroup = this.dataHelper.applyOperations(extractedArray, query.TRANSFORMATIONS.APPLY);
+		let final = this.queryHelper.addAdditionalColumnsToAggregatedResults(operatedGroup, extractedArray);
+
+		if (query.OPTIONS && query.OPTIONS.COLUMNS) {
+			const orderedColumns = query.OPTIONS.COLUMNS;
+			final = this.reorderItems(final, orderedColumns);
+		}
+
+		return final;
+	}
+
+
+	public reorderItems(items: any[], columns: string[]): any[] {
+		return items.map((item: any) => {
+			const orderedItem: any = {};
+			columns.forEach((column: string) => {
+				orderedItem[column] = item[column];
+			});
+			return orderedItem;
+		});
+	}
+
 }

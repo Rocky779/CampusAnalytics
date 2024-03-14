@@ -13,7 +13,6 @@ export class CustomRoomsDatasetHelper {
 		this.roomsDatasetHelper = new GeolocationFetcher();
 	}
 
-// hello
 	public async createDataset(decodedContent: JSZip): Promise<any[]> {
 		const indexHtml = decodedContent.file("index.htm");
 		if (!indexHtml) {
@@ -37,8 +36,8 @@ export class CustomRoomsDatasetHelper {
 			}
 			const buildingInfo = this.extractBuildingInfo(buildingTable, building);
 			const buildingFileContent = await buildingFile.async("text");
-			const buildingDocument = parse(buildingFileContent);
-			const roomTable = this.roomsDatasetHelper.findRoomTable(buildingDocument);
+			const parsedData = parse(buildingFileContent);
+			const roomTable = this.roomsDatasetHelper.findRoomTable(parsedData);
 			if (roomTable) {
 				// Extract room information from the room table for this building
 				const roomInfos = this.extractRoomInfo(roomTable);
