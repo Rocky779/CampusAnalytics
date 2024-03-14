@@ -1,0 +1,160 @@
+{
+	"title": "Query Wildcard",
+	"input": {
+		"WHERE": {
+			"IS": {
+			  "rooms_number": "B*"
+			}
+		  },
+		  "OPTIONS": {
+			"COLUMNS": [
+			  "rooms_shortname",
+			  "rooms_number"
+			]
+		  }
+		},
+	"errorExpected": false,
+	"expected": [
+			  {
+				"rooms_shortname": "ALRD",
+				"rooms_number": "B101"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B141"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B142"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B208"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B209"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B210"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B211"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B213"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B215"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B216"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B218"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B219"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B302"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B303"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B304"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B306"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B307"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B308"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B309"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B310"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B312"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B313"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B315"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B316"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B318"
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B319"
+			  },
+			  {
+				"rooms_shortname": "CHEM",
+				"rooms_number": "B150"
+			  },
+			  {
+				"rooms_shortname": "CHEM",
+				"rooms_number": "B250"
+			  },
+			  {
+				"rooms_shortname": "SPPH",
+				"rooms_number": "B108"
+			  },
+			  {
+				"rooms_shortname": "SPPH",
+				"rooms_number": "B112"
+			  },
+			  {
+				"rooms_shortname": "SPPH",
+				"rooms_number": "B136"
+			  },
+			  {
+				"rooms_shortname": "SPPH",
+				"rooms_number": "B138"
+			  },
+			  {
+				"rooms_shortname": "SPPH",
+				"rooms_number": "B151"
+			  },
+			  {
+				"rooms_shortname": "WOOD",
+				"rooms_number": "B75"
+			  },
+			  {
+				"rooms_shortname": "WOOD",
+				"rooms_number": "B79"
+			  }
+			]
+}
+

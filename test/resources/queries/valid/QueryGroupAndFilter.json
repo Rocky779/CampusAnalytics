@@ -1,0 +1,52 @@
+{
+	"title": "Query with Grouping by Furniture and Applying Count",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+		  "COLUMNS": [
+			"rooms_furniture"
+		  ]
+		},
+		"TRANSFORMATIONS": {
+		  "GROUP": [
+			"rooms_furniture"
+		  ],
+		  "APPLY": [
+			{
+			  "roomCount": {
+				"COUNT": "rooms_number"
+			  }
+			}
+		  ]
+		}
+		},
+	"errorExpected": false,
+	"expected": [
+			  {
+				"rooms_type": "Case Style"
+			  },
+			  {
+				"rooms_type": "Open Design General Purpose"
+			  },
+			  {
+				"rooms_type": "Small Group"
+			  },
+			  {
+				"rooms_type": "Tiered Large Group"
+			  },
+			  {
+				"rooms_type": ""
+			  },
+			  {
+				"rooms_type": "TBD"
+			  },
+			  {
+				"rooms_type": "Active Learning"
+			  },
+			  {
+				"rooms_type": "Studio Lab"
+			  }
+			]
+
+}
+

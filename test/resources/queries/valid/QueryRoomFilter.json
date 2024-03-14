@@ -1,0 +1,460 @@
+{
+	"title": "Query with Grouping by Furniture and Applying Count",
+	"input": {
+		"WHERE": {
+			"IS": { "rooms_type": "Open Design General Purpose" }
+		  },
+		  "OPTIONS": {
+			"COLUMNS": ["rooms_shortname", "rooms_number", "rooms_seats"]
+		  }
+		},
+	"errorExpected": false,
+	"expected": [
+			  {
+				"rooms_shortname": "ALRD",
+				"rooms_number": "112",
+				"rooms_seats": 20
+			  },
+			  {
+				"rooms_shortname": "ALRD",
+				"rooms_number": "113",
+				"rooms_seats": 20
+			  },
+			  {
+				"rooms_shortname": "ALRD",
+				"rooms_number": "B101",
+				"rooms_seats": 44
+			  },
+			  {
+				"rooms_shortname": "ANSO",
+				"rooms_number": "207",
+				"rooms_seats": 90
+			  },
+			  {
+				"rooms_shortname": "BRKX",
+				"rooms_number": "2367",
+				"rooms_seats": 24
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B141",
+				"rooms_seats": 42
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B142",
+				"rooms_seats": 26
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B209",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B210",
+				"rooms_seats": 48
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B211",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B218",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B219",
+				"rooms_seats": 24
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B303",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B309",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "B318",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D201",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D204",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D301",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D312",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D314",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D316",
+				"rooms_seats": 50
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D317",
+				"rooms_seats": 50
+			  },
+			  {
+				"rooms_shortname": "BUCH",
+				"rooms_number": "D322",
+				"rooms_seats": 50
+			  },
+			  {
+				"rooms_shortname": "CHBE",
+				"rooms_number": "103",
+				"rooms_seats": 60
+			  },
+			  {
+				"rooms_shortname": "EOSM",
+				"rooms_number": "135",
+				"rooms_seats": 50
+			  },
+			  {
+				"rooms_shortname": "FNH",
+				"rooms_number": "40",
+				"rooms_seats": 54
+			  },
+			  {
+				"rooms_shortname": "FNH",
+				"rooms_number": "50",
+				"rooms_seats": 43
+			  },
+			  {
+				"rooms_shortname": "FORW",
+				"rooms_number": "303",
+				"rooms_seats": 63
+			  },
+			  {
+				"rooms_shortname": "LASR",
+				"rooms_number": "107",
+				"rooms_seats": 51
+			  },
+			  {
+				"rooms_shortname": "GEOG",
+				"rooms_number": "101",
+				"rooms_seats": 60
+			  },
+			  {
+				"rooms_shortname": "GEOG",
+				"rooms_number": "147",
+				"rooms_seats": 60
+			  },
+			  {
+				"rooms_shortname": "GEOG",
+				"rooms_number": "200",
+				"rooms_seats": 100
+			  },
+			  {
+				"rooms_shortname": "GEOG",
+				"rooms_number": "201",
+				"rooms_seats": 42
+			  },
+			  {
+				"rooms_shortname": "GEOG",
+				"rooms_number": "212",
+				"rooms_seats": 72
+			  },
+			  {
+				"rooms_shortname": "HEBB",
+				"rooms_number": "10",
+				"rooms_seats": 54
+			  },
+			  {
+				"rooms_shortname": "HEBB",
+				"rooms_number": "12",
+				"rooms_seats": 54
+			  },
+			  {
+				"rooms_shortname": "HEBB",
+				"rooms_number": "13",
+				"rooms_seats": 54
+			  },
+			  {
+				"rooms_shortname": "ANGU",
+				"rooms_number": "254",
+				"rooms_seats": 80
+			  },
+			  {
+				"rooms_shortname": "ANGU",
+				"rooms_number": "291",
+				"rooms_seats": 54
+			  },
+			  {
+				"rooms_shortname": "ANGU",
+				"rooms_number": "295",
+				"rooms_seats": 54
+			  },
+			  {
+				"rooms_shortname": "ANGU",
+				"rooms_number": "296",
+				"rooms_seats": 37
+			  },
+			  {
+				"rooms_shortname": "ANGU",
+				"rooms_number": "432",
+				"rooms_seats": 16
+			  },
+			  {
+				"rooms_shortname": "ANGU",
+				"rooms_number": "435",
+				"rooms_seats": 53
+			  },
+			  {
+				"rooms_shortname": "ANGU",
+				"rooms_number": "437",
+				"rooms_seats": 32
+			  },
+			  {
+				"rooms_shortname": "IONA",
+				"rooms_number": "633",
+				"rooms_seats": 50
+			  },
+			  {
+				"rooms_shortname": "IBLC",
+				"rooms_number": "261",
+				"rooms_seats": 112
+			  },
+			  {
+				"rooms_shortname": "SOWK",
+				"rooms_number": "124",
+				"rooms_seats": 68
+			  },
+			  {
+				"rooms_shortname": "SOWK",
+				"rooms_number": "222",
+				"rooms_seats": 29
+			  },
+			  {
+				"rooms_shortname": "SOWK",
+				"rooms_number": "223",
+				"rooms_seats": 29
+			  },
+			  {
+				"rooms_shortname": "SOWK",
+				"rooms_number": "224",
+				"rooms_seats": 31
+			  },
+			  {
+				"rooms_shortname": "LSK",
+				"rooms_number": "460",
+				"rooms_seats": 75
+			  },
+			  {
+				"rooms_shortname": "LSK",
+				"rooms_number": "462",
+				"rooms_seats": 42
+			  },
+			  {
+				"rooms_shortname": "MCLD",
+				"rooms_number": "214",
+				"rooms_seats": 60
+			  },
+			  {
+				"rooms_shortname": "MCLD",
+				"rooms_number": "242",
+				"rooms_seats": 60
+			  },
+			  {
+				"rooms_shortname": "MCLD",
+				"rooms_number": "254",
+				"rooms_seats": 84
+			  },
+			  {
+				"rooms_shortname": "MCML",
+				"rooms_number": "154",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "MATH",
+				"rooms_number": "104",
+				"rooms_seats": 48
+			  },
+			  {
+				"rooms_shortname": "MATH",
+				"rooms_number": "105",
+				"rooms_seats": 30
+			  },
+			  {
+				"rooms_shortname": "MATH",
+				"rooms_number": "203",
+				"rooms_seats": 48
+			  },
+			  {
+				"rooms_shortname": "MATH",
+				"rooms_number": "204",
+				"rooms_seats": 30
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3002",
+				"rooms_seats": 25
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3004",
+				"rooms_seats": 25
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3052",
+				"rooms_seats": 25
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3058",
+				"rooms_seats": 25
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3062",
+				"rooms_seats": 16
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3068",
+				"rooms_seats": 16
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3072",
+				"rooms_seats": 16
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "3074",
+				"rooms_seats": 72
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "4052",
+				"rooms_seats": 25
+			  },
+			  {
+				"rooms_shortname": "ORCH",
+				"rooms_number": "4058",
+				"rooms_seats": 25
+			  },
+			  {
+				"rooms_shortname": "PHRM",
+				"rooms_number": "3208",
+				"rooms_seats": 72
+			  },
+			  {
+				"rooms_shortname": "PCOH",
+				"rooms_number": "1001",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "PCOH",
+				"rooms_number": "1002",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "PCOH",
+				"rooms_number": "1003",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "OSBO",
+				"rooms_number": "A",
+				"rooms_seats": 442
+			  },
+			  {
+				"rooms_shortname": "SPPH",
+				"rooms_number": "B151",
+				"rooms_seats": 66
+			  },
+			  {
+				"rooms_shortname": "UCLL",
+				"rooms_number": "103",
+				"rooms_seats": 55
+			  },
+			  {
+				"rooms_shortname": "UCLL",
+				"rooms_number": "107",
+				"rooms_seats": 48
+			  },
+			  {
+				"rooms_shortname": "MGYM",
+				"rooms_number": "206",
+				"rooms_seats": 25
+			  },
+			  {
+				"rooms_shortname": "MGYM",
+				"rooms_number": "208",
+				"rooms_seats": 40
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "105",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "107",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "109",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "305",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "307",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "309",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "405",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "407",
+				"rooms_seats": 47
+			  },
+			  {
+				"rooms_shortname": "SWNG",
+				"rooms_number": "409",
+				"rooms_seats": 47
+			  }
+			]
+}
+
