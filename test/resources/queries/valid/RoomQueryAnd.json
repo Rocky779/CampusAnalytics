@@ -1,0 +1,37 @@
+{
+	"title": "Query with Simple Equality Condition",
+	"input": {
+		"WHERE": {
+			"AND": [
+			  {
+				"EQ": {
+				  "rooms_seats": 20
+				}
+			  },
+			  {
+				"IS": {
+				  "rooms_address": "1822 East Mall"
+				}
+			  }
+			]
+		  },
+		  "OPTIONS": {
+			"COLUMNS": [
+			  "rooms_shortname",
+			  "rooms_number"
+			]
+		  }
+		},
+	"errorExpected": false,
+	"expected": [
+					  {
+						"rooms_shortname": "ALRD",
+						"rooms_number": "112"
+					  },
+					  {
+						"rooms_shortname": "ALRD",
+						"rooms_number": "113"
+					  }
+					]
+}
+

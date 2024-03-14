@@ -82,6 +82,9 @@ export class DataProcessor {
 					case "SUM":
 						appliedGroup[targetKey] = this.calculateSum(group, sourceKey);
 						break;
+					case "COUNT":
+						appliedGroup[targetKey] = this.calculateCount(group);
+						break;
 					default:
 						// Handle unsupported operation types
 						break;
@@ -101,6 +104,11 @@ export class DataProcessor {
 		}
 		return max;
 	}
+
+	public calculateCount(group: any[]): number {
+		return group.length;
+	}
+
 
 	public calculateMin(group: any[], key: string): number {
 		let min = Number.MAX_SAFE_INTEGER;

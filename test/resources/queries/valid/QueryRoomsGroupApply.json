@@ -1,0 +1,51 @@
+{
+	"title": "Query with Grouping by Type and Applying Average Seats",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+		  "COLUMNS": [
+			"rooms_type"
+		  ]
+		},
+		  "TRANSFORMATIONS": {
+			"GROUP": [
+			  "rooms_type"
+			],
+			"APPLY": [
+			  {
+				"avgSeats": {
+				  "AVG": "rooms_seats"
+				}
+			  }
+			]
+		  }
+		},
+	"errorExpected": false,
+	"expected": [
+			  {
+				"rooms_type": "Case Style"
+			  },
+			  {
+				"rooms_type": "Open Design General Purpose"
+			  },
+			  {
+				"rooms_type": "Small Group"
+			  },
+			  {
+				"rooms_type": "Tiered Large Group"
+			  },
+			  {
+				"rooms_type": ""
+			  },
+			  {
+				"rooms_type": "TBD"
+			  },
+			  {
+				"rooms_type": "Active Learning"
+			  },
+			  {
+				"rooms_type": "Studio Lab"
+			  }
+			]
+}
+

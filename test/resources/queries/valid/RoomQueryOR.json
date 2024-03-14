@@ -1,0 +1,115 @@
+{
+	"title": "Query with Simple Equality Condition",
+	"input": {
+		"WHERE": { "OR": [
+			{ "EQ": { "rooms_seats": 20 } },
+			{ "EQ": { "rooms_seats": 50 } }
+		  ]},
+		  "OPTIONS": { "COLUMNS": ["rooms_shortname", "rooms_seats", "rooms_number"] }
+	},
+	"errorExpected": false,
+	"expected": [
+				  {
+					"rooms_shortname": "ALRD",
+					"rooms_seats": 20,
+					"rooms_number": "112"
+				  },
+				  {
+					"rooms_shortname": "ALRD",
+					"rooms_seats": 20,
+					"rooms_number": "113"
+				  },
+				  {
+					"rooms_shortname": "ALRD",
+					"rooms_seats": 50,
+					"rooms_number": "121"
+				  },
+				  {
+					"rooms_shortname": "AUDX",
+					"rooms_seats": 20,
+					"rooms_number": "142"
+				  },
+				  {
+					"rooms_shortname": "BUCH",
+					"rooms_seats": 50,
+					"rooms_number": "D316"
+				  },
+				  {
+					"rooms_shortname": "BUCH",
+					"rooms_seats": 50,
+					"rooms_number": "D317"
+				  },
+				  {
+					"rooms_shortname": "BUCH",
+					"rooms_seats": 50,
+					"rooms_number": "D322"
+				  },
+				  {
+					"rooms_shortname": "EOSM",
+					"rooms_seats": 50,
+					"rooms_number": "135"
+				  },
+				  {
+					"rooms_shortname": "FSC",
+					"rooms_seats": 20,
+					"rooms_number": "1615"
+				  },
+				  {
+					"rooms_shortname": "FSC",
+					"rooms_seats": 20,
+					"rooms_number": "1617"
+				  },
+				  {
+					"rooms_shortname": "LASR",
+					"rooms_seats": 20,
+					"rooms_number": "211"
+				  },
+				  {
+					"rooms_shortname": "LASR",
+					"rooms_seats": 20,
+					"rooms_number": "5C"
+				  },
+				  {
+					"rooms_shortname": "ANGU",
+					"rooms_seats": 20,
+					"rooms_number": "339"
+				  },
+				  {
+					"rooms_shortname": "IONA",
+					"rooms_seats": 50,
+					"rooms_number": "633"
+				  },
+				  {
+					"rooms_shortname": "IBLC",
+					"rooms_seats": 50,
+					"rooms_number": "155"
+				  },
+				  {
+					"rooms_shortname": "SCRF",
+					"rooms_seats": 20,
+					"rooms_number": "1021"
+				  },
+				  {
+					"rooms_shortname": "SCRF",
+					"rooms_seats": 20,
+					"rooms_number": "1022"
+				  },
+				  {
+					"rooms_shortname": "SCRF",
+					"rooms_seats": 20,
+					"rooms_number": "1023"
+				  },
+				  {
+					"rooms_shortname": "SCRF",
+					"rooms_seats": 20,
+					"rooms_number": "1024"
+				  },
+				  {
+					"rooms_shortname": "ORCH",
+					"rooms_seats": 20,
+					"rooms_number": "4072"
+				  }
+				]
+
+}
+
