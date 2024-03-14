@@ -97,8 +97,6 @@ export default class InsightFacade implements IInsightFacade {
 		}
 		// check if ID already exists
 		if (!this.datasetIds.includes(id)) {
-			console.log("Debug");
-			console.log(this.datasetIds);
 			return Promise.reject(new NotFoundError("This ID does not exist in the datasetIDs"));
 		}
 		// Actually remove the data
@@ -187,7 +185,6 @@ export default class InsightFacade implements IInsightFacade {
 
 			if (query.TRANSFORMATIONS !== undefined) {
 				try {
-					console.log(items);
 					wanted = await this.handleTransformations(query, items, allIDs);
 				} catch (error) {
 					return Promise.reject(error);
@@ -201,8 +198,6 @@ export default class InsightFacade implements IInsightFacade {
 					return Promise.reject(new InsightError("Sorting error"));
 				}
 			}
-
-			console.log(wanted);
 			// Return the result
 			return Promise.resolve(wanted);
 		} catch (error) {
@@ -218,8 +213,6 @@ export default class InsightFacade implements IInsightFacade {
 
 		let wanted2 = this.queryHelper.traverseOptions(items, query.OPTIONS, true, allIDs);
 		wanted2 = wanted2.filter((item: any) => Object.values(item).every((val: any) => val !== undefined));
-		console.log(wanted2);
-
 		const groupedData = this.dataHelper.groupByMultipleParameters(wanted2, query.TRANSFORMATIONS.GROUP);
 		const extractedArray = this.dataHelper.extractArrays(groupedData);
 		const operatedGroup = this.dataHelper.applyOperations(extractedArray, query.TRANSFORMATIONS.APPLY);
