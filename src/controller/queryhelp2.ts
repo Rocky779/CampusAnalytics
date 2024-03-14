@@ -95,16 +95,6 @@ export class DataProcessor {
 		return appliedGroup;
 	}
 
-	public calculateMax(group: any[], key: string): number {
-		let max = Number.MIN_SAFE_INTEGER;
-		for (const item of group) {
-			if (item[key] > max) {
-				max = item[key];
-			}
-		}
-		return max;
-	}
-
 
 	public calculateCount(group: any[], key: string): number {
 		const uniqueValues = new Set();
@@ -117,34 +107,58 @@ export class DataProcessor {
 		return uniqueValues.size;
 	}
 
-
-	public calculateMin(group: any[], key: string): number {
-		let min = Number.MAX_SAFE_INTEGER;
+	public calculateMax(group: any[], key: string): number | null {
+		let max = null;
 		for (const item of group) {
-			if (item[key] < min) {
-				min = item[key];
+			const value = parseFloat(item[key]);
+			if (!isNaN(value)) {
+				max = max === null ? value : Math.max(max, value);
+			}
+		}
+		return max;
+	}
+
+	public calculateMin(group: any[], key: string): number | null {
+		let min = null;
+		for (const item of group) {
+			const value = parseFloat(item[key]);
+			if (!isNaN(value)) {
+				min = min === null ? value : Math.min(min, value);
 			}
 		}
 		return min;
 	}
 
-	public calculateAverage(group: any[], key: string): number {
+	public calculateAverage(group: any[], key: string): number | null {
 		let total = new Decimal(0);
+		let count = 0;
 		for (const item of group) {
-			total = total.add(new Decimal(item[key]));
+			const value = parseFloat(item[key]);
+			if (!isNaN(value)) {
+				total = total.add(new Decimal(value));
+				count++;
+			}
 		}
-		const numRows = group.length;
-		const avg = total.dividedBy(numRows);
-		return Number(avg.toFixed(2));
+		if (count === 0) {
+			return null;
+		}
+		const avg = total.dividedBy(count);
+		return parseFloat(avg.toFixed(2));
 	}
 
-	public calculateSum(group: any[], key: string): number {
+	public calculateSum(group: any[], key: string): number | null {
 		let sum = new Decimal(0);
+		let validData = false;
 		for (const item of group) {
-			sum = sum.add(new Decimal(item[key]));
+			const value = parseFloat(item[key]);
+			if (!isNaN(value)) {
+				sum = sum.add(new Decimal(value));
+				validData = true;
+			}
 		}
-		return Number(sum.toFixed(2));
+		return validData ? parseFloat(sum.toFixed(2)) : null;
 	}
+
 
 	// public addAdditionalColumnsToAggregatedResults(aggregatedGroups: any[], groups: any[]): any[] {
 	// 	const resultsWithAdditionalColumns: any[] = [];
