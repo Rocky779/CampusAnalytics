@@ -129,7 +129,6 @@ export class QueryHelper {
 		}
 		const validColumns = options.COLUMNS.filter((column: string) => column.includes("_"));
 		const invalidColumns = options.COLUMNS.filter((column: string) => !column.includes("_"));
-		console.log(validColumns);
 		this.columns.push(...invalidColumns);
 		console.log(allIDs);
 		// Check if each column is a valid string
