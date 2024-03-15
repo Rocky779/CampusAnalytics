@@ -15,17 +15,18 @@ export class SectionsDatasetHelper {
 		}
 		// Step 1: Decode and unzip the base64 content
 		const zip = new JSZip();
+		const COURSES = "courses/";
 		const decodedContent = await zip.loadAsync(content, {base64: true});
-		const coursesFolder = decodedContent.folder("courses");
+		const coursesFolder = decodedContent.folder(COURSES);
 		if (coursesFolder === null) {
 			return Promise.reject(new InsightError("courses/ folder not found in the zip file."));
 		}
-		if (Object.keys(coursesFolder.files)[0] !== "courses/") {
+		if (Object.keys(coursesFolder.files)[0] !== COURSES) {
 			return Promise.reject(new InsightError("courses/ named folder doest exist"));
 		}
 		let validDataset = false;
 		const filePromises = Object.keys(coursesFolder.files).map(async (fileName) => {
-			if (!fileName.startsWith("courses/")) {
+			if (!fileName.startsWith(COURSES)) {
 				return Promise.reject(new InsightError("Invalid file name:"));
 			}
 			const fileEntry = coursesFolder.files[fileName];
@@ -67,7 +68,6 @@ export class SectionsDatasetHelper {
 			this.datasetIds.includes(id)
 		);
 	}
-
 
 	private checkValidSectionParameterKind(section: any) {
 		return (
