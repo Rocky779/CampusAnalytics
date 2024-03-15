@@ -110,39 +110,74 @@ export default class InsightFacade implements IInsightFacade {
 		}
 	}
 
+	// public async listDatasets(): Promise<InsightDataset[]> {
+	// 	await this.loadDatasetIds();
+	// 	try {
+	// 		if (this.datasetIds.length === 0) {
+	// 			return Promise.resolve([]); // Return empty array if no dataset IDs are available
+	// 		}
+	// 		const dataFolderPath = "data";
+	//
+	// 		const readFilesPromises = this.datasetIds.map(async (id) => {
+	// 			const filePath = path.join(dataFolderPath, `${id}.json`);
+	// 			try {
+	// 				const fileContent = await fs.promises.readFile(filePath, "utf-8");
+	// 				const parsedData = JSON.parse(fileContent);
+	//
+	// 				if (Array.isArray(parsedData) && parsedData.length > 0) {
+	// 					return parsedData[0];
+	// 				} else {
+	// 					return null; // If file content is empty or not an array
+	// 				}
+	// 			} catch (error) {
+	// 				return null; // Skip if file doesn't exist or cannot be read
+	// 			}
+	// 		});
+	//
+	// 		const datasetObjects = await Promise.all(readFilesPromises);
+	// 		// Filter out null values (failed reads or empty arrays)
+	// 		const filteredDatasetObjects = datasetObjects.filter((obj) => obj !== null);
+	//
+	// 		return Promise.resolve(filteredDatasetObjects);
+	// 	} catch (error) {
+	// 		return Promise.reject(new Error("Error listing datasets"));
+	// 	}
+	// }
 	public async listDatasets(): Promise<InsightDataset[]> {
 		await this.loadDatasetIds();
+
+		const dataFolderPath = "data";
+		const readFilesPromises: Array<Promise<InsightDataset | null>> = [];
+
+		for (const id of this.datasetIds) {
+			const filePath = path.join(dataFolderPath, `${id}.json`);
+			readFilesPromises.push(this.readFile(filePath));
+		}
+
 		try {
-			if (this.datasetIds.length === 0) {
-				return Promise.resolve([]); // Return empty array if no dataset IDs are available
-			}
-			const dataFolderPath = "data";
-
-			const readFilesPromises = this.datasetIds.map(async (id) => {
-				const filePath = path.join(dataFolderPath, `${id}.json`);
-				try {
-					const fileContent = await fs.promises.readFile(filePath, "utf-8");
-					const parsedData = JSON.parse(fileContent);
-
-					if (Array.isArray(parsedData) && parsedData.length > 0) {
-						return parsedData[0];
-					} else {
-						return null; // If file content is empty or not an array
-					}
-				} catch (error) {
-					return null; // Skip if file doesn't exist or cannot be read
-				}
-			});
-
 			const datasetObjects = await Promise.all(readFilesPromises);
-			// Filter out null values (failed reads or empty arrays)
-			const filteredDatasetObjects = datasetObjects.filter((obj) => obj !== null);
-
-			return Promise.resolve(filteredDatasetObjects);
+			const filteredDatasetObjects = datasetObjects.filter((obj) => obj !== null) as InsightDataset[];
+			return filteredDatasetObjects;
 		} catch (error) {
-			return Promise.reject(new Error("Error listing datasets"));
+			throw new Error("Error listing datasets");
 		}
 	}
+
+	private async readFile(filePath: string): Promise<InsightDataset | null> {
+		try {
+			const fileContent = await fs.promises.readFile(filePath, "utf-8");
+			const parsedData = JSON.parse(fileContent);
+
+			if (Array.isArray(parsedData) && parsedData.length > 0) {
+				return parsedData[0];
+			} else {
+				return null;
+			}
+		} catch (error) {
+			return null;
+		}
+	}
+
 
 	public async performQuery(query: any): Promise<InsightResult[]> {
 		try {
