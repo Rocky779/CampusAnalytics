@@ -218,5 +218,8 @@ module.exports = {
 			2
 		],
 		"max-statements-per-line": "error"
-	}
+	},
+	"ignorePatterns": [
+		"frontend/**/*"
+	]
 };
