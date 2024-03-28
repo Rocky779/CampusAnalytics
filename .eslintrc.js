@@ -93,7 +93,12 @@ module.exports = {
 		"@typescript-eslint/triple-slash-reference": "error",
 		"@typescript-eslint/type-annotation-spacing": "error",
 		"@typescript-eslint/unified-signatures": "error",
-		"@typescript-eslint/no-floating-promises": "error",
+		"@typescript-eslint/no-floating-promises": [
+			"error",
+			{
+				"ignoreIIFE": true
+			}
+		],
 		"@typescript-eslint/no-misused-promises": [
 			"error",
 			{
