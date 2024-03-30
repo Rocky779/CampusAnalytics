@@ -90,7 +90,6 @@ describe("InsightFacade", function () {
 			return expect(result2).to.eventually.be.rejectedWith(InsightError);
 		});
 
-
 		it("should reject a dataset without valid sections", async function () {
 			let a3 = await getContentFromArchives("courses.zip");
 			// Execute the addDataset method with an empty dataset id and invalid arguments
@@ -269,7 +268,6 @@ describe("InsightFacade", function () {
 			expect(items).to.deep.include({id: "ubc", kind: InsightDatasetKind.Sections, numRows: 307});
 			expect(items).to.deep.include({id: "abc", kind: InsightDatasetKind.Sections, numRows: 307});
 		});
-
 
 		// Execution: Test case - it should reject with NotFoundError if removing a non-existent dataset
 		// it("should reject with NotFoundError if removing a non-existent dataset", function () {
