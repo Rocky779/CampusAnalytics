@@ -1,6 +1,8 @@
-import express, {Application, Request, Response} from "express";
+import express, {Application, Request, Response, request} from "express";
 import * as http from "http";
 import cors from "cors";
+import InsightFacade from "../controller/InsightFacade";
+import {InsightDatasetKind} from "../controller/IInsightFacade";
 
 export default class Server {
 	private readonly port: number;
@@ -35,14 +37,16 @@ export default class Server {
 				console.error("Server::start() - server already listening");
 				reject();
 			} else {
-				this.server = this.express.listen(this.port, () => {
-					console.info(`Server::start() - server listening on port: ${this.port}`);
-					resolve();
-				}).on("error", (err: Error) => {
-					// catches errors in server start
-					console.error(`Server::start() - server ERROR: ${err.message}`);
-					reject(err);
-				});
+				this.server = this.express
+					.listen(this.port, () => {
+						console.info(`Server::start() - server listening on port: ${this.port}`);
+						resolve();
+					})
+					.on("error", (err: Error) => {
+						// catches errors in server start
+						console.error(`Server::start() - server ERROR: ${err.message}`);
+						reject(err);
+					});
 			}
 		});
 	}
@@ -82,10 +86,91 @@ export default class Server {
 	private registerRoutes() {
 		// This is an example endpoint this you can invoke by accessing this URL in your browser:
 		// http://localhost:4321/echo/hello
+		// this.express.get("/echo/:msg", Server.echo);
 		this.express.get("/echo/:msg", Server.echo);
 
+		// Dataset endpoints
+		this.express.put("/dataset/:id/:kind", this.addDataset);
+		this.express.delete("/dataset/:id", this.removeDataset);
+		this.express.post("/query", this.performQuery);
+		this.express.get("/datasets", this.listDatasets);
 		// TODO: your other endpoints should go here
+	}
 
+	private async addDataset(req: Request, res: Response) {
+		try {
+			// Placeholder logic for adding a dataset
+			let facade = new InsightFacade();
+			let id: string = req.params.id;
+			let content = Buffer.from(JSON.stringify(request.body)).toString("base64");
+			let kind;
+			if (request.params.kind === "rooms") {
+				kind = InsightDatasetKind.Rooms;
+			} else if (request.params.kind === "sections") {
+				kind = InsightDatasetKind.Sections;
+			} else {
+				res.status(400).json({error: "Invalid Kind"});
+			}
+			if (kind !== undefined) {
+				console.log(`Adding dataset with id: ${id} and kind: ${kind}`);
+				await facade.addDataset(id, content, kind);
+				res.status(200).json({result: `Dataset ${id} added successfully`});
+			}
+		} catch (error: unknown) {
+			// Check if error is an instance of Error and thus has a message property
+			if (error instanceof Error) {
+				res.status(400).json({error: error.message});
+			} else {
+				// If the error is not an instance of Error, handle it generically
+				res.status(400).json({error: "An error occurred"});
+			}
+		}
+	}
+
+	private async removeDataset(req: Request, res: Response) {
+		const {id} = req.params;
+
+		try {
+			// Placeholder logic for removing a dataset
+			console.log(`Removing dataset with id: ${id}`);
+			res.status(200).json({result: `Dataset ${id} removed successfully`});
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				res.status(400).json({error: error.message});
+			} else {
+				res.status(400).json({error: "An error occurred"});
+			}
+		}
+	}
+
+	private async performQuery(req: Request, res: Response) {
+		const query = req.body;
+
+		try {
+			// Placeholder logic for performing a query
+			console.log(`Performing query: ${JSON.stringify(query)}`);
+			res.status(200).json({result: `Results for query ${JSON.stringify(query)}`});
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				res.status(400).json({error: error.message});
+			} else {
+				res.status(400).json({error: "An error occurred"});
+			}
+		}
+	}
+
+	private async listDatasets(req: Request, res: Response) {
+		try {
+			// Placeholder logic for listing datasets
+			console.log("Listing all datasets");
+			res.status(200).json({datasets: ["dataset1", "dataset2", "dataset3"]}); // Example response
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				res.status(500).json({error: error.message});
+			} else {
+				res.status(500).json({error: "An error occurred"});
+			}
+		}
 	}
 
 	// The next two methods handle the echo service.
@@ -93,6 +178,7 @@ export default class Server {
 	// By updating the Server.echo function pointer above, these methods can be easily moved.
 	private static echo(req: Request, res: Response) {
 		try {
+			console.log(`Server::echo(..) - params: ${JSON.stringify("daniel")}`);
 			console.log(`Server::echo(..) - params: ${JSON.stringify(req.params)}`);
 			const response = Server.performEcho(req.params.msg);
 			res.status(200).json({result: response});
