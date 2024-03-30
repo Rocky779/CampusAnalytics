@@ -15,17 +15,17 @@ const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms}) => {
 
 	if (!isLoaded) return <div>Loading...</div>;
 
-	// Set the center of the map to the first room's coordinates as an example
+	// Optionally, set the center of the map dynamically based on the rooms' locations
 	const center = {
-		lat: rooms[0]?.lat || 49.2606, // Fallback to default coords if rooms are empty
-		lng: rooms[0]?.lon || -123.246,
+		lat: rooms.length > 0 ? rooms[0].lat : 49.2606, // Default to the first room's location or a fallback
+		lng: rooms.length > 0 ? rooms[0].lon : -123.246,
 	};
 
 	return (
 		<GoogleMap mapContainerStyle={{width: "100%", height: "100%"}} center={center} zoom={15}>
-			{/* Render markers for each room */}
+			{/* Map through rooms and place a marker for each one */}
 			{rooms.map((room, index) => (
-				<Marker key={index} position={{lat: room.lat, lng: room.lon}} label={room.name} />
+				<Marker key={index} position={{lat: room.lat, lng: room.lon}} label={room.shortname} />
 			))}
 		</GoogleMap>
 	);

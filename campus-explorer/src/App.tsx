@@ -143,7 +143,7 @@ function App() {
 				</div>
 				<div className="Map">
 					{/* Pass the selected room details to GoogleMapsComponent */}
-					<GoogleMapsComponent rooms={selectedRoomDetails} />
+					<GoogleMapsComponent rooms={rooms} />
 					<RoomDetails rooms={selectedRoomDetails} />
 				</div>
 			</div>
