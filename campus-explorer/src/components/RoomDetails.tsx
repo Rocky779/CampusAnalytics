@@ -1,33 +1,28 @@
 import React from "react";
 import {Card, CardContent, Typography} from "@mui/material";
+import {Room} from "./types";
 
-interface RoomDetailProps {
-	room: {
-		fullname: string;
-		shortname: string;
-		number: string;
-		name: string;
-		address: string;
-		seats: number;
-	};
-	selectedRooms: string[]; // Add selectedRooms prop
+interface RoomDetailsProps {
+	rooms: Room[];
 }
 
-const RoomDetail: React.FC<RoomDetailProps> = ({room, selectedRooms}) => {
+const RoomDetails: React.FC<RoomDetailsProps> = ({rooms}) => {
 	return (
-		<Card>
-			<CardContent>
-				<Typography variant="h5">{room.fullname}</Typography>
-				<Typography variant="subtitle1">{room.shortname}</Typography>
-				<Typography variant="body1">Room number: {room.number}</Typography>
-				<Typography variant="body1">Room name: {room.name}</Typography>
-				<Typography variant="body1">Address: {room.address}</Typography>
-				<Typography variant="body1">Seats: {room.seats}</Typography>
-				{/* Render selectedRooms if needed */}
-				{selectedRooms && <Typography variant="body1">Selected Rooms: {selectedRooms.join(", ")}</Typography>}
-			</CardContent>
-		</Card>
+		<div>
+			{rooms.map((room, index) => (
+				<Card key={index} style={{marginBottom: "1rem"}}>
+					<CardContent>
+						<Typography variant="h5">{room.fullname}</Typography>
+						<Typography variant="subtitle1">{room.shortname}</Typography>
+						<Typography variant="body1">Room number: {room.number}</Typography>
+						<Typography variant="body1">Room name: {room.name}</Typography>
+						<Typography variant="body1">Address: {room.address}</Typography>
+						<Typography variant="body1">Seats: {room.seats}</Typography>
+					</CardContent>
+				</Card>
+			))}
+		</div>
 	);
 };
 
-export default RoomDetail;
+export default RoomDetails;

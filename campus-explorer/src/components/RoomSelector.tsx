@@ -1,19 +1,14 @@
 // src/components/RoomSelector.tsx
 
-import React, {useState} from "react";
-import {Select, MenuItem, InputLabel, FormControl, OutlinedInput, Chip, SelectChangeEvent} from "@mui/material";
+import React from "react";
+import {Select, MenuItem, InputLabel, FormControl, OutlinedInput, Chip} from "@mui/material";
+import {Room} from "./types";
+import {useState} from "react";
+import {SelectChangeEvent} from "@mui/material";
 
 interface RoomSelectorProps {
-	rooms: {
-		id: string;
-		fullname: string;
-		shortname: string;
-		number: string;
-		name: string;
-		address: string;
-		seats: number;
-	}[];
-	onSelectRoom: (selectedRooms: string[]) => void; // Change the type here to expect an array of strings
+	rooms: Room[];
+	onSelectRoom: (selectedRoomIds: string[]) => void;
 }
 
 const RoomSelector: React.FC<RoomSelectorProps> = ({rooms, onSelectRoom}) => {
@@ -39,13 +34,13 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({rooms, onSelectRoom}) => {
 				renderValue={(selected) => (
 					<div>
 						{selected.map((value) => (
-							<Chip key={value} label={rooms.find((room) => room.id === value)?.name || value} />
+							<Chip key={value} label={rooms.find((room) => room.name === value)?.name || value} />
 						))}
 					</div>
 				)}
 			>
 				{rooms.map((room) => (
-					<MenuItem key={room.id} value={room.id}>
+					<MenuItem key={room.name} value={room.name}>
 						{room.name}
 					</MenuItem>
 				))}
