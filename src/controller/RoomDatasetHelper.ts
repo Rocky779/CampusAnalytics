@@ -53,7 +53,7 @@ export class RoomsDatasetHelper {
 
 			return Promise.resolve(this.datasetIds);
 		} catch (error) {
-			return Promise.reject(new InsightError());
+			return Promise.reject(new InsightError("error some"));
 		}
 	}
 
@@ -69,6 +69,7 @@ export class RoomsDatasetHelper {
 	private async validateDatasetStructure(content: string): Promise<void> {
 		try {
 			const zip = new JSZip();
+			// Prolly error happens here
 			const decodedContent = await zip.loadAsync(content, {base64: true});
 			await this.utilHelper.validateCampusFolder(decodedContent);
 			const indexHtml = decodedContent.file("index.htm");
@@ -76,6 +77,7 @@ export class RoomsDatasetHelper {
 				return Promise.reject( new InsightError("index.htm not found at the root of the zip file."));
 			}
 		} catch (error) {
+			console.log(error);
 			return Promise.reject(new InsightError("Error validating dataset structure."));
 		}
 	}

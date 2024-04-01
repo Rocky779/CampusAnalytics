@@ -100,36 +100,30 @@ export default class Server {
 
 	private async addDataset(req: Request, res: Response) {
 		try {
-			// Placeholder kind logic for adding a dataset
 			let facade = new InsightFacade();
 			console.log(req.body);
 			let id: string = req.params.id;
 
 			// TODO figure out how to add sections in this context
-			let sections = "";
-			// let content = Buffer.from(JSON.stringify(req.body)).toString("base64");
-			// let sections = await getContentFromArchives("dataset.zip");
-			console.log("Request Body:", req.body);
+			let content = req.body.toString("base64");
 			let kind;
 			if (req.params.kind === "sections") {
 				kind = InsightDatasetKind.Sections;
+				console.log(`Adding dataset with id: ${id} and kind: ${kind}`);
+				let answer = await facade.addDataset(id, content, kind);
+				res.status(200).json({result: answer});
 			} else if (req.params.kind === "rooms") {
 				kind = InsightDatasetKind.Rooms;
+				console.log(`Adding dataset with id: ${id} and kind: ${kind}`);
+				let answer = await facade.addDataset(id, content, kind);
+				res.status(200).json({result: answer});
 			} else {
 				res.status(400).json({error: "Invalid Kind"});
 			}
-			if (kind !== undefined) {
-				console.log(`Adding dataset with id: ${id} and kind: ${kind}`);
-				await facade.addDataset(id, sections, kind);
-				res.status(200).json({result: `Dataset ${id} added successfully`});
-			}
 		} catch (error: unknown) {
-			// Check if error is an instance of Error and thus has a message property
 			if (error instanceof Error) {
+				console.log(error);
 				res.status(400).json({error: error.message});
-			} else {
-				// If the error is not an instance of Error, handle it generically
-				res.status(400).json({error: "An error occurred"});
 			}
 		}
 	}
@@ -139,16 +133,15 @@ export default class Server {
 			// Placeholder logic for removing a dataset
 			let facade = new InsightFacade();
 			let id = req.params.id;
-			console.log(`Removing dataset with id: ${id}`);
 			await facade.removeDataset(id);
-			res.status(200).json({result: `Dataset ${id} removed successfully`});
+			res.status(200).json({result: id});
 		} catch (error: unknown) {
-			if (error instanceof Error) {
-				res.status(400).json({error: error.message});
-			} else if (error instanceof NotFoundError) {
-				res.status(404).json({error: "Dataset not found"});
-				res.status(400).json({error: "An error occurred"});
+			if (error instanceof NotFoundError) {
+				res.status(404).json({error: error.message});
+			} else {
+				res.status(400).json({error: "Insight Error occurred"});
 			}
+
 		}
 	}
 
@@ -157,30 +150,21 @@ export default class Server {
 			// Placeholder logic for performing a query
 			let facade = new InsightFacade();
 			const query = await facade.performQuery(req.body);
-			console.log(`Performing query: ${JSON.stringify(query)}`);
-			res.status(200).json({result: `Results for query ${JSON.stringify(query)}`});
+			res.status(200).json({result: query});
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				res.status(400).json({error: error.message});
-			} else {
-				res.status(400).json({error: "An error occurred"});
 			}
 		}
 	}
 
-	private async listDatasets(res: Response) {
+	private async listDatasets(req: Request, res: Response) {
 		try {
-			// Placeholder logic for listing datasets
 			let facade = new InsightFacade();
-			let datasets = await facade.listDatasets();
-			console.log("Listing all datasets");
-			res.status(200).json({datasets: [datasets]}); // Example response
-		} catch (error: unknown) {
-			if (error instanceof Error) {
-				res.status(500).json({error: error.message});
-			} else {
-				res.status(500).json({error: "An error occurred"});
-			}
+			let abc = await facade.listDatasets();
+			res.status(200).json({result: abc});
+		} catch (e: any){
+			res.status(200).json({result: []});
 		}
 	}
 
