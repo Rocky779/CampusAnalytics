@@ -3,7 +3,6 @@ import * as http from "http";
 import cors from "cors";
 import InsightFacade from "../controller/InsightFacade";
 import {InsightDatasetKind, NotFoundError} from "../controller/IInsightFacade";
-import {getContentFromArchives} from "../../test/resources/TestUtil";
 
 export default class Server {
 	private readonly port: number;
@@ -124,6 +123,8 @@ export default class Server {
 			if (error instanceof Error) {
 				console.log(error);
 				res.status(400).json({error: error.message});
+			} else{
+				res.status(400).json({error: "Error"});
 			}
 		}
 	}
@@ -154,9 +155,13 @@ export default class Server {
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				res.status(400).json({error: error.message});
+			} else{
+				res.status(400).json({error: "Error"});
 			}
+
 		}
 	}
+
 
 	private async listDatasets(req: Request, res: Response) {
 		try {
