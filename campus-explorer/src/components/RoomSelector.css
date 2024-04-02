@@ -1,0 +1,25 @@
+.room-selector {
+	padding: 1rem;
+	background: #f9f9f9;
+	border-bottom: 1px solid #ddd;
+  }
+
+  .room-selector input[type="text"] {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+  }
+
+  .room-list {
+	margin-top: 1rem;
+  }
+
+  .room-list label {
+	display: block;
+	margin: 0.5rem 0;
+  }
+
+  .room-list input[type="checkbox"] {
+	margin-right: 0.5rem;
+  }

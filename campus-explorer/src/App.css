@@ -1,25 +1,37 @@
-/* App.css */
 body, html {
 	margin: 0;
 	padding: 0;
 	height: 100%;
 	width: 100%;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .App {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
   }
 
   .Content {
 	display: flex;
-	flex-grow: 1; /* Fill the available space below the header */
-	overflow: hidden; /* Prevent internal scroll */
+	height: calc(100vh - 64px); /* Adjust the height based on your header's height */
   }
 
-  .Sidebar, .Map {
-	flex-basis: 50%; /* Each takes up half the screen */
-	flex-grow: 0; /* Prevents them from growing larger than 50% */
-	flex-shrink: 0; /* Prevents them from shrinking smaller than 50% */
-	height: calc(100vh - 64px); /* Adjust the 64px if your header height is different */
+  .Sidebar {
+	width: 50%; /* Sidebar takes up half the width */
   }
 
   .Map {
-	padding: 1rem;
-	box-sizing: border-box;
+	width: 50%; /* Map takes up the other half of the width */
+	position: relative; /* Position relative for absolute positioning of table */
+  }
+
+  /* Adjust the positioning of the table */
+  .RoomDataList {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 50%; /* Adjust as needed */
+	height: 50%; /* Adjust as needed */
+	z-index: 1; /* Ensure the table appears above the map */
   }
