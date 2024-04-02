@@ -5,7 +5,7 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import RoomSelector from "./components/RoomSelector";
 import RoomDetails from "./components/RoomDetails";
-import {Room} from "./components/types"; // Make sure this path is correct
+import {Room} from "./components/types";
 import RoomDataList from "./components/RoomDataList";
 
 function App() {
@@ -127,7 +127,6 @@ function App() {
 		],
 		[]
 	);
-
 	useEffect(() => {
 		const details = rooms.filter((room) => selectedRoomNames.includes(room.name));
 		setSelectedRoomDetails(details);
@@ -142,7 +141,7 @@ function App() {
 					<RoomSelector filter={filter} onFilterChange={setFilter} />
 				</div>
 				<div className="Map">
-					<GoogleMapsComponent rooms={rooms} />
+					<GoogleMapsComponent rooms={rooms} selectedRoomNames={[]} />
 				</div>
 				<div className="RoomDataListContainer">
 					<RoomDataList

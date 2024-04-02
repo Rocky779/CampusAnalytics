@@ -7,7 +7,12 @@ interface GoogleMapsComponentProps {
 	rooms: Room[]; // Change from selectedRooms to rooms to receive the full room objects
 }
 
-const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms}) => {
+interface GoogleMapsComponentProps {
+	rooms: Room[];
+	selectedRoomNames: string[];
+}
+
+const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms, selectedRoomNames}) => {
 	const {isLoaded} = useJsApiLoader({
 		id: "google-map-script",
 		googleMapsApiKey: "AIzaSyAVANdCAPvvjZU9miE8nhBSzskKciy02do", // Replace with your actual API key
@@ -24,9 +29,11 @@ const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms}) => {
 	return (
 		<GoogleMap mapContainerStyle={{width: "100%", height: "100%"}} center={center} zoom={15}>
 			{/* Map through rooms and place a marker for each one */}
-			{rooms.map((room, index) => (
-				<Marker key={index} position={{lat: room.lat, lng: room.lon}} label={room.shortname} />
-			))}
+			{rooms
+				.filter((room) => selectedRoomNames.includes(room.name))
+				.map((room, index) => (
+					<Marker key={index} position={{lat: room.lat, lng: room.lon}} label={room.shortname} />
+				))}
 		</GoogleMap>
 	);
 };

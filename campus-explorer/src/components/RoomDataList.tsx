@@ -1,4 +1,3 @@
-// src/components/RoomDataList.tsx
 import React, {useEffect, useState} from "react";
 import "./RoomDataList.css";
 import {Room} from "./types";
@@ -31,7 +30,12 @@ const RoomDataList: React.FC<RoomDataListProps> = ({rooms, onSelectRoom}) => {
 				<thead>
 					<tr>
 						<th>Select</th>
-						{/* Other headers */}
+						<th>Room Number</th>
+						<th>Short Name</th>
+						<th>Full Name</th>
+						<th>Address</th>
+						<th>Seats</th>
+						<th>Name</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -44,7 +48,12 @@ const RoomDataList: React.FC<RoomDataListProps> = ({rooms, onSelectRoom}) => {
 									onChange={() => toggleRoomSelection(room.name)}
 								/>
 							</td>
-							{/* Other room details cells */}
+							<td>{room.number}</td>
+							<td>{room.shortname}</td>
+							<td>{room.fullname}</td>
+							<td>{room.address}</td>
+							<td>{room.seats}</td>
+							<td>{room.name}</td>
 						</tr>
 					))}
 				</tbody>

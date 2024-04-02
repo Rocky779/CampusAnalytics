@@ -1,37 +1,46 @@
-body, html {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-	width: 100%;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  }
-
-  .App {
-	display: flex;
-	flex-direction: column;
+.App {
+	display: grid;
+	grid-template-columns: 30% 70%; /* 30% for sidebar and room selector, 70% for map */
 	height: 100vh;
   }
 
   .Content {
 	display: flex;
-	height: calc(100vh - 64px); /* Adjust the height based on your header's height */
+	flex-direction: row;
+	height: calc(100vh - 64px);
   }
 
   .Sidebar {
-	width: 50%; /* Sidebar takes up half the width */
+	width: 100%; /* Use 100% of the sidebar area */
   }
 
   .Map {
-	width: 50%; /* Map takes up the other half of the width */
-	position: relative; /* Position relative for absolute positioning of table */
+	position: relative;
+	width: 100%; /* Use 100% of the map area */
   }
 
-  /* Adjust the positioning of the table */
-  .RoomDataList {
+  .RoomDataListContainer {
 	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 50%; /* Adjust as needed */
-	height: 50%; /* Adjust as needed */
-	z-index: 1; /* Ensure the table appears above the map */
+	top: 0;
+	right: 0;
+	width: 300px; /* Fixed width */
+	height: 100%;
+	background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+	overflow-y: auto; /* Scrollable */
+	z-index: 5;
+  }
+
+  .room-data-list {
+	max-height: 50vh;
+	overflow-y: auto;
+  }
+
+  /* Update styles for selected table rows */
+  .room-data-list tr.selected {
+	background-color: #e9ecef;
+  }
+
+  /* Update z-index for table headers to stick */
+  .room-data-list thead th {
+	z-index: 2;
   }
