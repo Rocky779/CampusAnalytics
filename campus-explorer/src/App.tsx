@@ -137,7 +137,6 @@ function App() {
 			<Header />
 			<div className="Content">
 				<div className="Sidebar">
-					<Sidebar />
 					<RoomSelector filter={filter} onFilterChange={setFilter} />
 				</div>
 				<div className="Map">

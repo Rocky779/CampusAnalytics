@@ -14,7 +14,7 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({filter, onFilterChange}) => 
 
 	return (
 		<div className="room-selector">
-			<input type="text" placeholder="Search for a room" value={filter} onChange={handleFilterChange} />
+			<input type="text" placeholder="Search by full name" value={filter} onChange={handleFilterChange} />
 		</div>
 	);
 };

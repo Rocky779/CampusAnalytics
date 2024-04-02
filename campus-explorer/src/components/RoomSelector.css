@@ -5,7 +5,7 @@
   }
 
   .room-selector input[type="text"] {
-	width: 100%;
+	width: 80%;
 	padding: 0.5rem;
 	border: 1px solid #ccc;
 	border-radius: 4px;
