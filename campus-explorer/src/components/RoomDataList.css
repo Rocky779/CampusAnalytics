@@ -1,25 +1,26 @@
 .room-data-list {
-	padding: 1rem;
-	overflow: auto; /* Scroll the data list inside its container */
-  }
+    padding: 1rem;
+    overflow: auto; /* Scroll the data list inside its container */
+    max-height: calc(100vh - 150px); /* Adjust the subtraction value as needed */
+}
 
-  .room-data-list table {
-	width: 100%;
-	border-collapse: collapse;
-  }
+.room-data-list table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-  .room-data-list th, .room-data-list td {
-	padding: 0.5rem;
-	border: 1px solid #ddd;
-	text-align: left;
-  }
+.room-data-list th, .room-data-list td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
 
-  .room-data-list thead {
-	background-color: #f2f2f2;
-	position: sticky;
-	top: 0; /* Stick the header on top when scrolling */
-  }
+.room-data-list thead {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0; /* Stick the header on top when scrolling */
+}
 
-  .room-data-list tr.selected {
-	background-color: #e9ecef;
-  }
+.room-data-list tr.selected {
+    background-color: #e9ecef;
+}

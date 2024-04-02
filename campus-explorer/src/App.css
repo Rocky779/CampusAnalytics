@@ -40,20 +40,55 @@
 	padding: 1rem; /* Spacing around data table */
   }
 
-  /* Further style adjustments for aesthetics */
   .RoomDataListContainer {
-	border-top: 1px solid #ccc; /* Visual separation between search bar and data table */
-	background-color: #f9f9f9; /* A light background for the data table area */
-  }
+    flex-grow: 1; /* Take remaining space */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Scrollable content */
+}
 
-  /* Sticky table header style if needed */
-  .room-data-list thead th {
-	position: sticky;
-	top: 0;
-	background-color: #fff;
-  }
+.room-data-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
 
-  /* You might want to adjust the sidebar/search functionality width if it's too narrow now */
-  .Sidebar {
-	width: 100%; /* Use the full width of the sidebar's grid area */
+.room-data-list .deselect-all-btn {
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.room-data-list table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.room-data-list th, .room-data-list td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.room-data-list thead {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+}
+
+.room-data-list tr.selected {
+    background-color: #e9ecef;
+}
+
+.walking-time-message {
+	position: absolute;
+	bottom: 50px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: white;
+	padding: 10px 20px; /* Larger padding for better visibility */
+	border-radius: 8px; /* Optional: for rounded corners */
+	box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Optional: for subtle shadow */
+	font-size: 1.5em; /* Larger font size */
+	z-index: 100; /* Ensure it's above other elements */
   }

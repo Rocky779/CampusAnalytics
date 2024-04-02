@@ -1,27 +1,29 @@
 import React, {useEffect, useState} from "react";
-import "./RoomDataList.css";
+import {Card, CardContent, Typography} from "@mui/material";
 import {Room} from "./types";
 
 interface RoomDataListProps {
 	rooms: Room[];
-	onSelectRoom: (selectedRoomNames: string[]) => void;
+	onSelectRoom: (selectedRooms: string[]) => void;
 }
 
 const RoomDataList: React.FC<RoomDataListProps> = ({rooms, onSelectRoom}) => {
 	const [selectedRoomNames, setSelectedRoomNames] = useState<string[]>([]);
 
+	const deselectAll = () => {
+		setSelectedRoomNames([]);
+		onSelectRoom([]);
+	};
+
 	const toggleRoomSelection = (roomName: string) => {
 		setSelectedRoomNames((prevSelected) => {
 			const isSelected = prevSelected.includes(roomName);
 			if (isSelected) {
-				// If the room is already selected, remove it from the selection
 				return prevSelected.filter((name) => name !== roomName);
 			} else {
-				// If the room is not selected and we have less than 5 rooms, add it to the selection
 				if (prevSelected.length < 5) {
 					return [...prevSelected, roomName];
 				} else {
-					// If we already have 5 rooms, alert the user and do nothing
 					alert("You can only select up to 5 rooms.");
 					return prevSelected;
 				}
@@ -34,8 +36,14 @@ const RoomDataList: React.FC<RoomDataListProps> = ({rooms, onSelectRoom}) => {
 	}, [selectedRoomNames, onSelectRoom]);
 
 	return (
-		<div className="room-data-list">
+		<div className="room-data-list" style={{maxHeight: "500px", overflowY: "auto"}}>
 			<h3>All Room Details</h3>
+			<div className="room-data-list">
+				<button onClick={deselectAll} className="deselect-all-btn">
+					Deselect All
+				</button>
+				<table>{/* table headers and rows here */}</table>
+			</div>
 			<table>
 				<thead>
 					<tr>
@@ -50,21 +58,23 @@ const RoomDataList: React.FC<RoomDataListProps> = ({rooms, onSelectRoom}) => {
 				</thead>
 				<tbody>
 					{rooms.map((room, index) => (
-						<tr key={index} className={selectedRoomNames.includes(room.name) ? "selected" : ""}>
+						<tr key={index} className={selectedRoomNames.includes(room.rooms_name) ? "selected" : ""}>
 							<td>
 								<input
 									type="checkbox"
-									checked={selectedRoomNames.includes(room.name)}
-									onChange={() => toggleRoomSelection(room.name)}
-									disabled={!selectedRoomNames.includes(room.name) && selectedRoomNames.length >= 5}
+									checked={selectedRoomNames.includes(room.rooms_name)}
+									onChange={() => toggleRoomSelection(room.rooms_name)}
+									disabled={
+										!selectedRoomNames.includes(room.rooms_name) && selectedRoomNames.length >= 5
+									}
 								/>
 							</td>
-							<td>{room.number}</td>
-							<td>{room.shortname}</td>
-							<td>{room.fullname}</td>
-							<td>{room.address}</td>
-							<td>{room.seats}</td>
-							<td>{room.name}</td>
+							<td>{room.rooms_number}</td>
+							<td>{room.rooms_shortname}</td>
+							<td>{room.rooms_fullname}</td>
+							<td>{room.rooms_address}</td>
+							<td>{room.rooms_seats}</td>
+							<td>{room.rooms_name}</td>
 						</tr>
 					))}
 				</tbody>

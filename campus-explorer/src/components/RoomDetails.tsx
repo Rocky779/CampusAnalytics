@@ -12,12 +12,12 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({rooms}) => {
 			{rooms.map((room, index) => (
 				<Card key={index} style={{marginBottom: "1rem"}}>
 					<CardContent>
-						<Typography variant="h5">{room.fullname}</Typography>
-						<Typography variant="subtitle1">{room.shortname}</Typography>
-						<Typography variant="body1">Room number: {room.number}</Typography>
-						<Typography variant="body1">Room name: {room.name}</Typography>
-						<Typography variant="body1">Address: {room.address}</Typography>
-						<Typography variant="body1">Seats: {room.seats}</Typography>
+						<Typography variant="h5">{room.rooms_fullname}</Typography>
+						<Typography variant="subtitle1">{room.rooms_shortname}</Typography>
+						<Typography variant="body1">Room number: {room.rooms_number}</Typography>
+						<Typography variant="body1">Room name: {room.rooms_name}</Typography>
+						<Typography variant="body1">Address: {room.rooms_address}</Typography>
+						<Typography variant="body1">Seats: {room.rooms_seats}</Typography>
 					</CardContent>
 				</Card>
 			))}

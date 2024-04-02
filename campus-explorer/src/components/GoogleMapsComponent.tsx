@@ -1,27 +1,29 @@
 import React, {useEffect, useState} from "react";
 import {GoogleMap, useJsApiLoader, Marker, DirectionsRenderer} from "@react-google-maps/api";
-import {Room} from "./types"; // Update this path as necessary
+import {Room} from "./types";
 
-interface GoogleMapsComponentProps {
+interface GoogleMapsProps {
 	rooms: Room[];
 	selectedRoomNames: string[];
 }
 
-const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms, selectedRoomNames}) => {
-	// State hooks
-	const [walkingTimeMessage, setWalkingTimeMessage] = useState("");
+const UBC_CAMPUS_CENTER = {lat: 49.2606, lng: -123.246};
+const DEFAULT_ZOOM = 15;
+const GOOGLE_MAPS_API_KEY = "AIzaSyAVANdCAPvvjZU9miE8nhBSzskKciy02do"; // Replace with your actual API key
+
+const GoogleMapsComponent: React.FC<GoogleMapsProps> = ({rooms, selectedRoomNames}) => {
+	const [walkingTimeMessage, setWalkingTimeMessage] = useState<string>("");
 	const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
 
-	// Load the Google Maps script
 	const {isLoaded, loadError} = useJsApiLoader({
 		id: "google-map-script",
-		googleMapsApiKey: "AIzaSyAVANdCAPvvjZU9miE8nhBSzskKciy02do", // Replace with your actual API key
+		googleMapsApiKey: GOOGLE_MAPS_API_KEY,
 	});
 
 	useEffect(() => {
 		if (isLoaded && selectedRoomNames.length > 1) {
-			const selectedRooms = rooms.filter((room) => selectedRoomNames.includes(room.name));
-			const uniqueBuildings = new Set(selectedRooms.map((room) => room.shortname));
+			const selectedRooms = rooms.filter((room) => selectedRoomNames.includes(room.rooms_name));
+			const uniqueBuildings = new Set(selectedRooms.map((room) => room.rooms_shortname));
 
 			if (uniqueBuildings.size === 1) {
 				setWalkingTimeMessage("Short walk within building");
@@ -29,7 +31,7 @@ const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms, selecte
 			} else {
 				const directionsService = new google.maps.DirectionsService();
 				const waypoints = selectedRooms.slice(1, -1).map((room) => ({
-					location: new google.maps.LatLng(room.lat, room.lon),
+					location: new google.maps.LatLng(room.rooms_lat, room.rooms_lon),
 					stopover: true,
 				}));
 				const origin = selectedRooms[0];
@@ -37,8 +39,8 @@ const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms, selecte
 
 				directionsService.route(
 					{
-						origin: new google.maps.LatLng(origin.lat, origin.lon),
-						destination: new google.maps.LatLng(destination.lat, destination.lon),
+						origin: new google.maps.LatLng(origin.rooms_lat, origin.rooms_lon),
+						destination: new google.maps.LatLng(destination.rooms_lat, destination.rooms_lon),
 						waypoints: waypoints,
 						optimizeWaypoints: true,
 						travelMode: google.maps.TravelMode.WALKING,
@@ -73,34 +75,31 @@ const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms, selecte
 
 	// Define the map's center
 	const center = {
-		lat: rooms.length > 0 ? rooms[0].lat : 49.2606,
-		lng: rooms.length > 0 ? rooms[0].lon : -123.246,
+		lat: rooms.length > 0 ? rooms[0].rooms_lat : 49.2606,
+		lng: rooms.length > 0 ? rooms[0].rooms_lon : -123.246,
 	};
 
 	// Render the Google Map
 	return (
-		<GoogleMap mapContainerStyle={{width: "100%", height: "100%"}} center={center} zoom={15}>
-			{rooms
-				.filter((room) => selectedRoomNames.includes(room.name))
-				.map((room, index) => (
-					<Marker key={index} position={{lat: room.lat, lng: room.lon}} label={room.shortname} />
-				))}
-			{walkingTimeMessage && (
-				<div
-					style={{
-						position: "absolute",
-						bottom: "50px",
-						left: "50%",
-						transform: "translateX(-50%)",
-						backgroundColor: "white",
-						padding: "5px",
-					}}
-				>
-					{walkingTimeMessage}
-				</div>
-			)}
-			{directions && <DirectionsRenderer directions={directions} options={{suppressMarkers: true}} />}
-		</GoogleMap>
+		<div style={{height: "500px", width: "100%"}}>
+			<GoogleMap
+				mapContainerStyle={{height: "100%", width: "100%"}}
+				center={UBC_CAMPUS_CENTER}
+				zoom={DEFAULT_ZOOM}
+			>
+				{directions && <DirectionsRenderer directions={directions} options={{suppressMarkers: true}} />}
+				{rooms
+					.filter((room) => selectedRoomNames.includes(room.rooms_name))
+					.map((room, index) => (
+						<Marker
+							key={index}
+							position={{lat: room.rooms_lat, lng: room.rooms_lon}}
+							label={room.rooms_shortname}
+						/>
+					))}
+			</GoogleMap>
+			{walkingTimeMessage && <div className="walking-time-message">{walkingTimeMessage}</div>}
+		</div>
 	);
 };
 

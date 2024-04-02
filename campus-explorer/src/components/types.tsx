@@ -1,14 +1,14 @@
 // src/types.ts
 export interface Room {
-	fullname: string;
-	shortname: string;
-	number: string;
-	name: string;
-	address: string;
-	lat: number;
-	lon: number;
-	seats: number;
-	type: string;
-	furniture: string;
-	href: string;
+	rooms_fullname: string;
+	rooms_shortname: string;
+	rooms_number: string;
+	rooms_name: string;
+	rooms_address: string;
+	rooms_lat: number;
+	rooms_lon: number;
+	rooms_seats: number;
+	rooms_type: string;
+	rooms_furniture: string;
+	rooms_href: string;
 }
