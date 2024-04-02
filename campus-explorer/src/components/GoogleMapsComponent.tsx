@@ -4,12 +4,8 @@ import {GoogleMap, useJsApiLoader, Marker} from "@react-google-maps/api";
 import {Room} from "./types"; // Update this path as necessary
 
 interface GoogleMapsComponentProps {
-	rooms: Room[]; // Change from selectedRooms to rooms to receive the full room objects
-}
-
-interface GoogleMapsComponentProps {
 	rooms: Room[];
-	selectedRoomNames: string[];
+	selectedRoomNames: string[]; // Make sure this prop is being used
 }
 
 const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms, selectedRoomNames}) => {
@@ -28,7 +24,6 @@ const GoogleMapsComponent: React.FC<GoogleMapsComponentProps> = ({rooms, selecte
 
 	return (
 		<GoogleMap mapContainerStyle={{width: "100%", height: "100%"}} center={center} zoom={15}>
-			{/* Map through rooms and place a marker for each one */}
 			{rooms
 				.filter((room) => selectedRoomNames.includes(room.name))
 				.map((room, index) => (

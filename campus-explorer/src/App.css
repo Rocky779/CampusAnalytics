@@ -1,46 +1,59 @@
 .App {
 	display: grid;
-	grid-template-columns: 30% 70%; /* 30% for sidebar and room selector, 70% for map */
+	grid-template-columns: 1fr 1fr; /* Two equal columns */
+	grid-template-rows: auto 1fr; /* Header size auto, content fills the rest */
 	height: 100vh;
   }
 
-  .Content {
-	display: flex;
-	flex-direction: row;
-	height: calc(100vh - 64px);
+  .Header {
+	grid-column: 1 / -1; /* Span across all columns */
+	background-color: #0077cc; /* Adjust the color to match your header */
+	color: white;
+	padding: 1rem;
+	text-align: center;
   }
 
-  .Sidebar {
-	width: 100%; /* Use 100% of the sidebar area */
+  .Content {
+	display: grid;
+	grid-column: 1 / -1; /* Span across all columns */
+	grid-template-rows: auto 1fr; /* Search bar height auto, the rest is for map and data table */
+	grid-template-columns: 1fr 1fr; /* Split the remaining space into two columns */
+	height: calc(100% - 50px); /* Adjust the height considering the header's height */
+  }
+
+  .SearchFunctionality {
+	grid-row: 1;
+	grid-column: 1;
+	padding: 1rem; /* Spacing around search bar */
   }
 
   .Map {
-	position: relative;
-	width: 100%; /* Use 100% of the map area */
+	grid-row: 1 / -1; /* Map spans from the search bar to the bottom */
+	grid-column: 2;
+	position: relative; /* Needed if you want to position anything absolutely inside */
   }
 
+  .DataTable {
+	grid-row: 2;
+	grid-column: 1;
+	overflow-y: auto; /* Allow scrolling */
+	padding: 1rem; /* Spacing around data table */
+  }
+
+  /* Further style adjustments for aesthetics */
   .RoomDataListContainer {
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 300px; /* Fixed width */
-	height: 100%;
-	background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
-	overflow-y: auto; /* Scrollable */
-	z-index: 5;
+	border-top: 1px solid #ccc; /* Visual separation between search bar and data table */
+	background-color: #f9f9f9; /* A light background for the data table area */
   }
 
-  .room-data-list {
-	max-height: 50vh;
-	overflow-y: auto;
-  }
-
-  /* Update styles for selected table rows */
-  .room-data-list tr.selected {
-	background-color: #e9ecef;
-  }
-
-  /* Update z-index for table headers to stick */
+  /* Sticky table header style if needed */
   .room-data-list thead th {
-	z-index: 2;
+	position: sticky;
+	top: 0;
+	background-color: #fff;
+  }
+
+  /* You might want to adjust the sidebar/search functionality width if it's too narrow now */
+  .Sidebar {
+	width: 100%; /* Use the full width of the sidebar's grid area */
   }

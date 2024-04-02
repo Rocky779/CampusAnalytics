@@ -141,7 +141,7 @@ function App() {
 					<RoomSelector filter={filter} onFilterChange={setFilter} />
 				</div>
 				<div className="Map">
-					<GoogleMapsComponent rooms={rooms} selectedRoomNames={[]} />
+					<GoogleMapsComponent rooms={rooms} selectedRoomNames={selectedRoomNames} />
 				</div>
 				<div className="RoomDataListContainer">
 					<RoomDataList
