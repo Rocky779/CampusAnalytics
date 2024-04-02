@@ -13,9 +13,19 @@ const RoomDataList: React.FC<RoomDataListProps> = ({rooms, onSelectRoom}) => {
 	const toggleRoomSelection = (roomName: string) => {
 		setSelectedRoomNames((prevSelected) => {
 			const isSelected = prevSelected.includes(roomName);
-			return isSelected
-				? prevSelected.filter((name) => name !== roomName)
-				: [...prevSelected, roomName].slice(0, 5);
+			if (isSelected) {
+				// If the room is already selected, remove it from the selection
+				return prevSelected.filter((name) => name !== roomName);
+			} else {
+				// If the room is not selected and we have less than 5 rooms, add it to the selection
+				if (prevSelected.length < 5) {
+					return [...prevSelected, roomName];
+				} else {
+					// If we already have 5 rooms, alert the user and do nothing
+					alert("You can only select up to 5 rooms.");
+					return prevSelected;
+				}
+			}
 		});
 	};
 
@@ -46,6 +56,7 @@ const RoomDataList: React.FC<RoomDataListProps> = ({rooms, onSelectRoom}) => {
 									type="checkbox"
 									checked={selectedRoomNames.includes(room.name)}
 									onChange={() => toggleRoomSelection(room.name)}
+									disabled={!selectedRoomNames.includes(room.name) && selectedRoomNames.length >= 5}
 								/>
 							</td>
 							<td>{room.number}</td>
