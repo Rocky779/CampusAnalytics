@@ -1,45 +1,80 @@
-# CPSC 310 Project Repository
+### InsightUBC: Managing Course Section and Room Data
 
-This repository contains starter code for the class project.
-Please keep your repository private.
+InsightUBC provides a powerful suite of features for managing datasets containing information about course sections and rooms at the University of British Columbia (UBC). Let's delve into the specifics of how InsightUBC handles both sections and rooms data:
 
-For information about the project, autotest, and the checkpoints, see the course webpage.
+---
 
-## Configuring your environment
+**Managing Course Section Data**
 
-To start using this project, you need to get your development environment configured so that you can build and execute the code.
-To do this, follow these steps; the specifics of each step will vary based on your operating system:
+InsightUBC's "Managing Course Section Data" functionality is designed to handle datasets comprising details about course sections at UBC. This entails parsing JSON data to extract crucial information such as id, title, department, instructor, pass, fail etc.
 
-1. [Install git](https://git-scm.com/downloads) (v2.X). You should be able to execute `git --version` on the command line after installation is complete.
+- **Dataset Format:** Course section datasets are structured JSON files, meticulously organized to conform to specific schema requirements established by the application.
 
-1. [Install Node LTS](https://nodejs.org/en/download/) (LTS: v18.X), which will also install NPM (you should be able to execute `node --version` and `npm --version` on the command line).
+- **Adding Datasets:** Users can seamlessly incorporate datasets into InsightUBC using the addDataset method. 
 
-1. [Install Yarn](https://yarnpkg.com/en/docs/install) (1.22.X). You should be able to execute `yarn --version`.
+- **Data Processing:** During the addition of a dataset, the adding dataset method undertakes the task of processing the JSON data. This process involves parsing the dataset, meticulously validating its structure, and transforming it into a format suitable for seamless querying and analysis.
 
-1. Clone your repository by running `git clone REPO_URL` from the command line. You can get the REPO_URL by clicking on the green button on your project repository page on GitHub. Note that due to new department changes you can no longer access private git resources using https and a username and password. You will need to use either [an access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) or [SSH](https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
+- **Listing Datasets:** The listDataset method allows users to retrieve a comprehensive list of available datasets. This functionality aids users in verifying which datasets are currently loaded into the system and ready for querying.
 
-## Project commands
+- **Removing Datasets:** Should the need arise, users have the ability to remove datasets from InsightUBC using the removeDataset method. This capability facilitates efficient management of stored datasets, freeing up system resources when datasets are no longer required.
 
-Once your environment is configured you need to further prepare the project's tooling and dependencies.
-In the project folder:
+- **Querying Data:** InsightUBC empowers users to perform a diverse range of queries to extract valuable insights from the dataset. Whether filtering, aggregating, or manipulating data, users have the tools needed to answer specific questions and conduct in-depth analysis.
 
-1. `yarn install` to download the packages specified in your project's *package.json* to the *node_modules* directory.
+---
 
-1. `yarn build` to compile your project. You must run this command after making changes to your TypeScript files. If it does not build locally, AutoTest will not be able to build it.
+**Managing Room Data**
 
-1. `yarn test` to run the test suite.
-    - To run with coverage, run `yarn cover`
+InsightUBC's "Managing Room Data" functionality extends its capabilities to encompass datasets containing information about rooms across UBC's campus. This involves parsing HTML files to extract pertinent details about rooms and buildings, providing users with a comprehensive understanding of campus facilities.
 
-1. `yarn lint` to lint your project code. If it does not lint locally, AutoTest will not run your tests when you submit your code.
+- **Dataset Format:** Room datasets are comprised of HTML files containing a wealth of information about various rooms and buildings across UBC's campus. These HTML files are structured within tables, requiring careful parsing to extract relevant data.
 
-1. `yarn pretty` to prettify your project code.
+- **Adding Datasets:** Users leverage the addDataset method to seamlessly integrate room datasets into InsightUBC. Unlike course section datasets, room datasets consist of HTML files, necessitating specialized handling for effective processing.
 
-If you are curious, some of these commands are actually shortcuts defined in [package.json -> scripts](./package.json).
+- **HTML Parsing:** The addDataset for rooms  meticulously parses the HTML files comprising room datasets, extracting essential data from tables and meticulously validating room information. This parsing process ensures the accuracy and integrity of the extracted data, laying the foundation for meaningful analysis.
 
-## Running and testing from an IDE
+- **Geolocation:** To facilitate accurate mapping of room locations, InsightUBC utilizes an external web service to fetch the latitude and longitude of buildings. This geolocation functionality enhances the spatial understanding of room distributions across UBC's campus.
 
-IntelliJ Ultimate should be automatically configured the first time you open the project (IntelliJ Ultimate is a free download through the [JetBrains student program](https://www.jetbrains.com/community/education/#students/)).
+- **Querying Data:** Users have the capability to query room datasets to uncover valuable insights such as room capacities, furniture types, building names, room numbers etc. Whether exploring room availability or assessing facility amenities, InsightUBC provides the tools necessary to conduct comprehensive analysis.
 
-### License
+In the frontend, We have implemnted the campus explorer part where we create a user interface for exploring the rooms dataset. This includes:
+1. **Viewing Buildings on a Map:**
+	- Displaying building locations on a map.
+	- Adding markers for each building in the dataset.
+2. **Room Insights:**
+	- Allowing users to select up to 5 rooms.
+	- Providing detailed information about each selected room.
+	- Estimating walking time between selected rooms, with shorter times for rooms in the same building.
 
-While the readings for this course are licensed using [CC-by-SA](https://creativecommons.org/licenses/by-sa/3.0/), **checkpoint descriptions and implementations are considered private materials**. Please do not post or share your project solutions. We go to considerable lengths to make the project an interesting and useful learning experience for this course. This is a great deal of work, and while future students may be tempted by your solutions, posting them does not do them any real favours. Please be considerate with these private materials and not pass them along to others, make your repos public, or post them to other sites online.
+### Video Link
+https://drive.google.com/file/d/1xXlguXn4edxj59hFI61zB6H5qTiGTx6I/view?usp=sharing
+
+### How to install, set up, and run your project
+1. Clone the InsightUBC repository to your local machine.
+
+2. Navigate to the project directory.
+
+3. Ensure that all required datasets are available in the designated directory (./data). Might have to go to InsightFacade.spec.ts and run the following test keeping clearDisk commented out:
+```typescript
+it("rooms", async function () {
+	let a04 = await getContentFromArchives("campus.zip");
+	// Execute the addDataset method with an empty dataset id and invalid arguments
+	const result = facade.addDataset("abc", a04, InsightDatasetKind.Rooms);
+	// Validation: Assert that the result is rejected with InsightError
+	return expect(result).to.eventually.have.members(["abc"]);
+});
+   ```
+4. To Start the React frontend:
+   ```bash
+    cd frontend
+
+    yarn start
+   ```
+
+5. Open another terminal window and start the server staying in project's root directory:
+    ```bash
+
+    yarn start
+   ```
+ 
+
+

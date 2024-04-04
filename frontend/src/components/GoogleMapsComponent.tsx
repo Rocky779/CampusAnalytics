@@ -88,15 +88,13 @@ const GoogleMapsComponent: React.FC<GoogleMapsProps> = ({rooms, selectedRoomName
 				zoom={DEFAULT_ZOOM}
 			>
 				{directions && <DirectionsRenderer directions={directions} options={{suppressMarkers: true}} />}
-				{rooms
-					.filter((room) => selectedRoomNames.includes(room.rooms_name))
-					.map((room, index) => (
-						<Marker
-							key={index}
-							position={{lat: room.rooms_lat, lng: room.rooms_lon}}
-							label={room.rooms_shortname}
-						/>
-					))}
+				{rooms.map((room, index) => (
+					<Marker
+						key={index}
+						position={{ lat: room.rooms_lat, lng: room.rooms_lon }}
+						label={room.rooms_shortname}
+					/>
+				))}
 			</GoogleMap>
 			{walkingTimeMessage && <div className="walking-time-message">{walkingTimeMessage}</div>}
 		</div>
