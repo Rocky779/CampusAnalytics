@@ -36,7 +36,7 @@ InsightUBC's "Managing Room Data" functionality extends its capabilities to enco
 
 - **Querying Data:** Users have the capability to query room datasets to uncover valuable insights such as room capacities, furniture types, building names, room numbers etc. InsightUBC provides the tools necessary to conduct comprehensive analysis through querying where we can perform conditional filtering,viewing specific columns, grouping data and finding aggregations.
 
-- Listing and removing datasets are done similarly in rooms as in sections
+- Listing and removing datasets are done similarly in rooms as in sections.
 
 In the frontend, We have implemented the campus explorer part where we create a user interface for exploring the rooms dataset. This includes:
 1. **Viewing Buildings on a Map:**
